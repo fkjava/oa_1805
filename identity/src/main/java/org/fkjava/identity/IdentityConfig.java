@@ -3,6 +3,9 @@ package org.fkjava.identity;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
@@ -12,6 +15,9 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.DelegatingPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.crypto.scrypt.SCryptPasswordEncoder;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
 /**
  * 针对Identity模块的配置
@@ -22,7 +28,20 @@ import org.springframework.security.crypto.scrypt.SCryptPasswordEncoder;
 @SpringBootApplication
 @ComponentScan("org.fkjava")
 @EnableJpaRepositories() // 激活JPA的自动DAO扫描
-public class IdentityConfig {
+public class IdentityConfig implements WebMvcConfigurer {
+
+	@Override
+	public void addInterceptors(InterceptorRegistry registry) {
+		// 通过拦截器统一设置ctx变量，这样每个页面都可以直接使用
+		registry.addInterceptor(new HandlerInterceptorAdapter() {
+			@Override
+			public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
+					throws Exception {
+				request.getServletContext().setAttribute("ctx", request.getContextPath());
+				return true;
+			}
+		}).addPathPatterns("/*");
+	}
 
 	@Bean
 	public PasswordEncoder passwordEncoder() {

@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import org.fkjava.identity.domain.Role;
@@ -29,7 +30,7 @@ public class IdentityServiceImpl implements IdentityService {
 	private UserDao userDao;
 	@Autowired
 	private RoleRepository roleRepository;
-	
+
 	@Autowired
 	private PasswordEncoder passwordEncoder;
 
@@ -103,7 +104,7 @@ public class IdentityServiceImpl implements IdentityService {
 
 			} else {
 				// 使用新的密码
-				String password= this.passwordEncoder.encode(user.getPassword());
+				String password = this.passwordEncoder.encode(user.getPassword());
 				user.setPassword(password);
 			}
 
@@ -119,7 +120,7 @@ public class IdentityServiceImpl implements IdentityService {
 					user.setPassword(old.getPassword());
 				} else {
 					// 使用新的密码
-					String password= this.passwordEncoder.encode(user.getPassword());
+					String password = this.passwordEncoder.encode(user.getPassword());
 					user.setPassword(password);
 				}
 				this.userDao.save(user);
@@ -187,5 +188,13 @@ public class IdentityServiceImpl implements IdentityService {
 		if (user != null) {
 			user.setStatus(User.Status.DISABLED);
 		}
+	}
+
+	@Override
+	public Optional<User> findByLoginName(String loginName) {
+		User user = this.userDao.findByLoginName(loginName);
+		// 把查询到的User转换为Optional
+		Optional<User> op = Optional.ofNullable(user);
+		return op;
 	}
 }
