@@ -56,6 +56,8 @@ public class LayoutConfig implements WebMvcConfigurer {
 		// /*使用main.jsp来装饰
 		// /admin/* 使用admin.jsp来装饰
 		initParameters.put("decoratorMappings", "/*=/WEB-INF/layouts/main.jsp\n/admin/*=/WEB-INF/layouts/admin.jsp");
+		// 排除某些路径不要装饰
+		// initParameters.put("exclude", "/identity/role,/identity/role/*");
 
 		bean.setInitParameters(initParameters);
 
