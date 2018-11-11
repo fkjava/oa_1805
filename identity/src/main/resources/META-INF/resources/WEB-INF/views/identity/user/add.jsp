@@ -7,11 +7,6 @@
 <head>
 <meta charset="UTF-8">
 <title>编辑用户信息</title>
-<link rel="stylesheet" href="${ctx }/webjars/bootstrap/3.3.7/dist/css/bootstrap.min.css"/>
-<link rel="stylesheet" href="${ctx }/static/css/fkjava.css"/>
-<script type="text/javascript" src="${ctx }/webjars/jquery/3.3.1/dist/jquery.slim.min.js"></script>
-<script type="text/javascript" src="${ctx }/webjars/bootstrap/3.3.7/dist/js/bootstrap.min.js"></script>
-<script type="text/javascript" src="${ctx }/static/js/fkjava.js"></script>
 </head>
 <body>
 <div class="container-fluid">
@@ -131,9 +126,7 @@
 			</form>
 		</div>
 	</div>
-	<script type="text/javascript">
-	
-	</script>
+	<script type="text/javascript" src="${ctx }/static/js/fkjava.js"></script>
 </div>
 </body>
 </html>
