@@ -40,5 +40,6 @@
 		<module>identity</module>
 		<module>menu</module>
 		<module>layout</module>
+		<module>security</module>
 	</modules>
 </project>
