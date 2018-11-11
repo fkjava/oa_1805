@@ -19,6 +19,13 @@
 			<version>${project.version}</version>
 		</dependency>
 
+		<!-- 使用页面装饰器，对所有的页面增加相应的装饰效果 -->
+		<dependency>
+			<groupId>org.sitemesh</groupId>
+			<artifactId>sitemesh</artifactId>
+			<version>3.0.1</version>
+		</dependency>
+
 		<!-- 加入Servlet API的依赖 -->
 		<dependency>
 			<groupId>javax.servlet</groupId>
