@@ -1,3 +1,4 @@
+<%@page import="java.util.Enumeration"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
@@ -11,6 +12,12 @@
 	<div class="col-sm-12 col-md-6 col-md-offset-3 text-center">
 		<c:if test="${param.logout eq '' }">
 			<div class="alert alert-success" role="alert">成功退出登录</div>
+		</c:if>
+		<c:if test="${param.error eq '' }">
+			<div class="alert alert-danger" role="alert">
+				<strong>登录失败</strong>
+				${sessionScope['SPRING_SECURITY_LAST_EXCEPTION'].message }
+			</div>
 		</c:if>
 		<form class="form-signin" action="${ctx }/security/do-login" method="post">
 		    <h2 class="form-signin-heading">请登录</h2>
