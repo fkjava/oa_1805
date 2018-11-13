@@ -1,12 +1,16 @@
 package org.fkjava.security;
 
 import org.fkjava.security.interceptors.UserHolderInterceptor;
+import org.fkjava.security.service.SecurityService;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
@@ -16,6 +20,20 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @EnableJpaRepositories
 @ComponentScan("org.fkjava")
 public class SecurityConfig extends WebSecurityConfigurerAdapter implements WebMvcConfigurer {
+
+	// 自定义AuthenticationProvider，不隐藏【用户未找到的异常】
+	// Spring Security会默认自动创建AuthenticationProvider
+	// 但是如果开发者自己提供了，那么就不会自动创建
+//	@Bean
+//	public DaoAuthenticationProvider authenticationProvider(//
+//			SecurityService securityService, //
+//			PasswordEncoder passwordEncoder) {
+//		DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
+//		provider.setHideUserNotFoundExceptions(false);
+//		provider.setUserDetailsService(securityService);
+//		provider.setPasswordEncoder(passwordEncoder);
+//		return provider;
+//	}
 
 	@Override
 	public void addInterceptors(InterceptorRegistry registry) {
