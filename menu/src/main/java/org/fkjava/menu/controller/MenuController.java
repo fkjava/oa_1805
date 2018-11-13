@@ -68,8 +68,6 @@ public class MenuController {
 	@ResponseBody
 	public List<Menu> findMyMenus() {
 		// 找当前用户的菜单
-		
-		// TODO 当前暂时没有用户，所以直接查询所有菜单
 		return this.menuService.findTopMenus();
 	}
 

@@ -1,4 +1,4 @@
-package org.fkjava.layout.service.impl;
+package org.fkjava.security.service.impl;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -6,8 +6,8 @@ import java.util.Optional;
 
 import org.fkjava.identity.domain.User;
 import org.fkjava.identity.service.IdentityService;
-import org.fkjava.layout.domain.UserDetails;
-import org.fkjava.layout.service.SecurityService;
+import org.fkjava.security.domain.UserDetails;
+import org.fkjava.security.service.SecurityService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
