@@ -50,18 +50,22 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter implements WebM
 //		return provider;
 //	}
 
-//	@Override
-//	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+	@Override
+	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+		// 不要调用super.configure(auth)方法
+		// 如果调用了，Spring会自动创建一个DaoAuthenticationProvider
+		// 具体创建的地方在InitializeUserDetailsBeanManagerConfigurer类里面
+		// 代码执行路径是从WebSecurityConfigurerAdapter.authenticationManager()进去的。
 //		super.configure(auth);
-//
-//		// 此时DaoAuthenticationProvider不会被Spring容器管理，而是直接注入到AuthenticationManagerBuilder里面
-//		DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
-//		provider.setHideUserNotFoundExceptions(false);
-//		provider.setUserDetailsService(securityService);
-//		provider.setPasswordEncoder(passwordEncoder);
-//
-//		auth.authenticationProvider(provider);
-//	}
+
+		// 此时DaoAuthenticationProvider不会被Spring容器管理，而是直接注入到AuthenticationManagerBuilder里面
+		DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
+		provider.setHideUserNotFoundExceptions(false);
+		provider.setUserDetailsService(securityService);
+		provider.setPasswordEncoder(passwordEncoder);
+
+		auth.authenticationProvider(provider);
+	}
 
 	@Override
 	public void addInterceptors(InterceptorRegistry registry) {
