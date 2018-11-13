@@ -68,7 +68,7 @@ public class MenuController {
 	@ResponseBody
 	public List<Menu> findMyMenus() {
 		// 找当前用户的菜单
-		return this.menuService.findTopMenus();
+		return this.menuService.findMyMenus();
 	}
 
 }
