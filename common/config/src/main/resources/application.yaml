@@ -33,3 +33,5 @@ spring:
       openInView: true
    messages:
       basename: org.fkjava.security.messages
+
+fkjava.storage.dir: /home/working/var/tmp

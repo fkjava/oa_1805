@@ -16,7 +16,7 @@ import org.fkjava.storage.service.StorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -24,15 +24,26 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 @Service
+@ConfigurationProperties(prefix = "fkjava.storage")
 public class StorageServiceImpl implements StorageService {
 
 	private static final Logger LOG = LoggerFactory.getLogger(StorageServiceImpl.class);
 
-	@Value(value = "${fkjava.storage.dir ?: /tmp/storage}")
-	private String dir;
+	// 使用普通Spring项目的时候，通过PropertyPlaceHolder方法加载文件的时候，可以利用@Value注入属性的值
+	// 冒号后面不能有空格，最好前面也不要有
+	// 冒号后面表示【默认值】
+	// @Value(value = "${fkjava.storage.dir?:/tmp/storage}")
+
+	// 在Spring Boot，配合@ConfigurationProperties注解和set方法，即可得到application.yaml文件中的参数
+	// 等号后面的初始值是在没有配置参数的时候使用的默认值
+	private String dir = "/tmp/storage";
 
 	@Autowired
 	private FileInfoRepository fileInfoRepository;
+
+	public void setDir(String dir) {
+		this.dir = dir;
+	}
 
 	@Override
 	public void save(FileInfo info, InputStream in) {
