@@ -42,5 +42,6 @@
 		<module>layout</module>
 		<module>security</module>
 		<module>storage</module>
+		<module>call-borad</module>
 	</modules>
 </project>
