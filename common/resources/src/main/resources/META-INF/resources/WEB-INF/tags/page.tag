@@ -6,7 +6,7 @@
 <c:set var="ctx" value="${pageContext.request.contextPath }" scope="application"></c:set>
 <%@ attribute name="url" required="true" type="java.lang.String" %>
 <%@ attribute name="page" required="true" type="org.springframework.data.domain.Page" %>
-<c:if test="${not empty page }">
+<c:if test="${not empty page and page.totalPages ne 0}">
 <nav aria-label="分页导航">
     <ul class="pagination">
         <li>
@@ -42,6 +42,6 @@
     </ul>
 </nav>
 </c:if>
-<c:if test="${empty page }">
+<c:if test="${empty page or page.totalPages eq 0}">
 	没有任何数据
 </c:if>
