@@ -15,8 +15,12 @@
 			编辑公告
 		</div>
 		<div class="panel-body">
+			表单
+			标题、类型选择
 			<div id="noticeContentEditor">
 			</div>
+			<input type="hidden" name="content" id="noticeContent"/>
+			按钮，保存的时候，要有状态（草稿、已发布、已撤回），阅读的时候必须是【已发布】的才能阅读。
 		</div>
 	</div>
 </div>
@@ -37,6 +41,14 @@
     editor.customConfig.uploadImgHeaders = {
    	    '${_csrf.headerName}': '${_csrf.token}'
    	};
+    // 接收改变后的内容，获取富文本编辑器里面的内容，放到#noticeContent里面
+    editor.customConfig.onchange = function(html){
+    	$("#noticeContent").val(html);
+    };
+    // 粘贴图片
+    editor.customConfig.pasteIgnoreImg = true;
+    // 不要过滤复制内容的样式，保持原本的样式，可能有些时候不能完全得到样式，此时可以自定义外观（写CSS）
+    editor.customConfig.pasteFilterStyle = false;
     
     // 创建编辑器
     editor.create();
