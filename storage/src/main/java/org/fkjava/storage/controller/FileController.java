@@ -5,6 +5,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URLEncoder;
 import java.nio.charset.Charset;
+import java.util.LinkedList;
+import java.util.List;
 
 import org.fkjava.common.data.domain.Result;
 import org.fkjava.storage.domain.FileInfo;
@@ -54,6 +56,15 @@ public class FileController {
 	@PostMapping
 	public String upload(@RequestParam("file") MultipartFile file) throws IOException {
 
+		this.wangEditorUpload(file);
+
+		return "redirect:/storage/file";
+	}
+
+	@PostMapping("wangEditor")
+	@ResponseBody
+	public WangEditorResponse wangEditorUpload(@RequestParam("file") MultipartFile file) throws IOException {
+		// 上传的代码、逻辑还是跟之前一样
 		FileInfo info = new FileInfo();
 		info.setContentType(file.getContentType());
 		info.setFileSize(file.getSize());
@@ -63,7 +74,32 @@ public class FileController {
 			this.storageService.save(info, in);
 		}
 
-		return "redirect:/storage/file";
+		// 只是返回加了一些内容
+		WangEditorResponse wangEditorResponse = new WangEditorResponse();
+		wangEditorResponse.setErrno(0);// 成功
+		wangEditorResponse.getData().add("/storage/file/" + info.getId());// 图片下载的路径
+		return wangEditorResponse;
+	}
+
+	public static class WangEditorResponse {
+		private int errno;
+		private List<String> data = new LinkedList<>();
+
+		public int getErrno() {
+			return errno;
+		}
+
+		public void setErrno(int errno) {
+			this.errno = errno;
+		}
+
+		public List<String> getData() {
+			return data;
+		}
+
+		public void setData(List<String> data) {
+			this.data = data;
+		}
 	}
 
 	@GetMapping("{id}")

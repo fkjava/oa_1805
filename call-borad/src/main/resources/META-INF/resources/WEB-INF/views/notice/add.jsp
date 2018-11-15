@@ -26,6 +26,18 @@
     var editor = new E('#noticeContentEditor');
     // 或者 var editor = new E( document.getElementById('editor') );
     
+    // 隐藏网络图片引用tab
+    //editor.customConfig.showLinkImg = false;
+    
+    // 显示图片上传的tab
+    editor.customConfig.uploadImgServer = '${ctx}/storage/file/wangEditor';
+    // 上传的时候，文件的字段名
+    editor.customConfig.uploadFileName = 'file';
+    // 自定义上传的时候请求头内容
+    editor.customConfig.uploadImgHeaders = {
+   	    '${_csrf.headerName}': '${_csrf.token}'
+   	};
+    
     // 创建编辑器
     editor.create();
 </script>
