@@ -32,8 +32,17 @@
 					</tr>
 				</thead>
 				<tbody>
-					<c:forEach items="${page.content }" var="u">
-					
+					<c:forEach items="${page.content }" var="i">
+						<tr>
+							<td>${i.name }</td>
+							<td>${i.contentType }</td>
+							<td>${i.fileSize }</td>
+							<td>${i.uploadTime }</td>
+							<td>
+								下载
+								删除
+							</td>
+						</tr>
 					</c:forEach>
 				</tbody>
 				<tfoot>
