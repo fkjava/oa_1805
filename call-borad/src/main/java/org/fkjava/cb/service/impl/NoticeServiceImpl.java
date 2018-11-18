@@ -1,11 +1,14 @@
 package org.fkjava.cb.service.impl;
 
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.fkjava.cb.domain.Notice;
 import org.fkjava.cb.domain.Notice.Status;
+import org.fkjava.cb.domain.NoticeRead;
 import org.fkjava.cb.domain.NoticeType;
+import org.fkjava.cb.repository.NoticeReadRepository;
 import org.fkjava.cb.repository.NoticeRepository;
 import org.fkjava.cb.repository.NoticeTypeRepository;
 import org.fkjava.cb.service.NoticeService;
@@ -13,6 +16,7 @@ import org.fkjava.identity.UserHolder;
 import org.fkjava.identity.domain.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -26,6 +30,8 @@ public class NoticeServiceImpl implements NoticeService {
 	private NoticeTypeRepository typeRepository;
 	@Autowired
 	private NoticeRepository noticeRepository;
+	@Autowired
+	private NoticeReadRepository noticeReadRepository;
 
 	@Override
 	public List<NoticeType> findAllTypes() {
@@ -67,7 +73,7 @@ public class NoticeServiceImpl implements NoticeService {
 	}
 
 	@Override
-	public Page<Notice> findNotices(Integer number, String keyword) {
+	public Page<NoticeRead> findNotices(Integer number, String keyword) {
 		// 标题、撰写时间、作者都可以非常方便查询出来，内容在列表显示的时候不关心
 		// 状态：草稿、已发布、已撤回
 		// 还有一个特殊状态：不同的用户有阅读状态，没有阅读、并且已经发布的，使用粗体字显示
@@ -79,9 +85,13 @@ public class NoticeServiceImpl implements NoticeService {
 		// 3.已经撤回的，只有作者能够查看
 		User author = UserHolder.get();
 		Pageable pageable = PageRequest.of(number, 10);
-		Page<Notice> page = this.noticeRepository.findNotices(author, pageable);
+		// Page<Notice> page = this.noticeRepository.findNotices(author, pageable);
 
-		// 处理关联查询
+		// 如果没有阅读记录，那么也会有公告记录
+		Page<NoticeRead> dataPage = this.noticeReadRepository.findNotices(author, author, pageable);
+		List<NoticeRead> content = dataPage.getContent();
+
+		Page<NoticeRead> page = new PageImpl<>(content, pageable, dataPage.getTotalElements());
 
 		return page;
 	}

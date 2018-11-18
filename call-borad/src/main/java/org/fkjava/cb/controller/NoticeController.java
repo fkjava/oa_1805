@@ -3,6 +3,7 @@ package org.fkjava.cb.controller;
 import java.util.List;
 
 import org.fkjava.cb.domain.Notice;
+import org.fkjava.cb.domain.NoticeRead;
 import org.fkjava.cb.domain.NoticeType;
 import org.fkjava.cb.service.NoticeService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,7 +28,7 @@ public class NoticeController {
 			@RequestParam(name = "keyword", required = false) String keyword) {
 		ModelAndView mav = new ModelAndView("notice/index");
 
-		Page<Notice> page = this.noticeService.findNotices(number, keyword);
+		Page<NoticeRead> page = this.noticeService.findNotices(number, keyword);
 		mav.addObject("page", page);
 
 		return mav;

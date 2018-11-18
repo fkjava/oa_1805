@@ -2,11 +2,17 @@
     pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ taglib prefix="fk" tagdir="/WEB-INF/tags" %>
 <!DOCTYPE html>
 <html>
 <head>
 <meta charset="UTF-8">
 <title>公告管理</title>
+<style type="text/css">
+.unread{
+	font-weight: bold;
+}
+</style>
 </head>
 <body>
 <div class="container-fluid">
@@ -30,24 +36,31 @@
 					</tr>
 				</thead>
 				<tbody>
-					<c:forEach items="${page.content }" var="n">
-						<tr>
-							<td>${n[0].title }</td>
-							<td>${n[0].author.name }</td>
-							<td><fmt:formatDate value="${n[0].writeTime }" pattern="yyyy-MM-dd HH:mm:ss"/></td>
+					<c:forEach items="${page.content }" var="nr">
+						<tr class="${(nr.notice.status eq 'RELEASED' and empty nr.readTime) ? 'unread': '' }">
+							<td>${nr.notice.title }</td>
+							<td>${nr.notice.author.name }</td>
+							<td><fmt:formatDate value="${nr.notice.writeTime }" pattern="yyyy-MM-dd HH:mm:ss"/></td>
 							<td>
 								<c:choose>
-									<c:when test="${n[0].status eq 'DRAFT' }">
+									<c:when test="${nr.notice.status eq 'DRAFT' }">
 										草稿
 									</c:when>
-									<c:when test="${n[0].status eq 'RECALL' }">撤回</c:when>
-									<c:when test="${n[0].status eq 'RELEASED' }">已发布</c:when>
+									<c:when test="${nr.notice.status eq 'RECALL' }">撤回</c:when>
+									<c:when test="${nr.notice.status eq 'RELEASED' }">已发布</c:when>
 								</c:choose>
 							</td>
 							<td></td>
 						</tr>
 					</c:forEach>
 				</tbody>
+				<tfoot>
+					<tr>
+						<td colspan="5" style="text-align: center;">
+							<fk:page url="/notice?keyword=${param.keyword }" page="${page }"/>
+						</td>
+					</tr>
+				</tfoot>
 			</table>
 		</div>
 	</div>
