@@ -44,7 +44,7 @@
 			    </div>
 			</div>
 			<div id="noticeContentEditor">${notice.content }</div>
-			<input type="hidden" name="content" id="noticeContent"/>
+			<textarea type="hidden" name="content" id="noticeContent" style="display: none;">${notice.content }</textarea>
 		</div>
 		<div class="panel-footer text-right">
 			<button class="btn btn-primary">提交</button>

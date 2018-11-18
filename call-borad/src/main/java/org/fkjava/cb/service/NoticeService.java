@@ -19,4 +19,14 @@ public interface NoticeService {
 
 	Page<NoticeRead> findNotices(Integer number, String keyword);
 
+	Notice findById(String id);
+
+	void recall(String id);
+
+	void deleteById(String id);
+
+	void publish(String id);
+
+	void read(String id);
+
 }

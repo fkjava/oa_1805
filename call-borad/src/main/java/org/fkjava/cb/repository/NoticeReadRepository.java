@@ -31,4 +31,6 @@ public interface NoticeReadRepository extends JpaRepository<NoticeRead, String> 
 			+ " order by case n.status when 'DRAFT' then 0 when 'RECALL' then 99 when 'RELEASED' then 1 end asc, n.releaseTime desc")
 	Page<NoticeRead> findNotices(@Param("author") User author, @Param("user") User user, Pageable pageable);
 
+	NoticeRead findByNoticeAndUser(Notice notice, User user);
+
 }

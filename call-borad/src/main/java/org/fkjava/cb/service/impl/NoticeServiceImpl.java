@@ -1,7 +1,6 @@
 package org.fkjava.cb.service.impl;
 
 import java.util.Date;
-import java.util.LinkedList;
 import java.util.List;
 
 import org.fkjava.cb.domain.Notice;
@@ -21,6 +20,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 @Service
@@ -94,5 +94,55 @@ public class NoticeServiceImpl implements NoticeService {
 		Page<NoticeRead> page = new PageImpl<>(content, pageable, dataPage.getTotalElements());
 
 		return page;
+	}
+
+	@Override
+	public Notice findById(String id) {
+		return this.noticeRepository.findById(id).orElse(null);
+	}
+
+	@Override
+	@Transactional
+	public void recall(String id) {
+		Notice n = this.findById(id);
+		if (n != null) {
+			n.setStatus(Status.RECALL);
+		}
+	}
+
+	@Override
+	public void deleteById(String id) {
+		Notice n = this.findById(id);
+		if (n != null) {
+			this.noticeRepository.delete(n);
+		}
+	}
+
+	@Override
+	@Transactional
+	public void publish(String id) {
+		Notice n = this.findById(id);
+		if (n != null) {
+			n.setStatus(Status.RELEASED);
+			n.setReleaseTime(new Date());
+		}
+	}
+
+	@Override
+	@Transactional
+	public void read(String id) {
+		User user = UserHolder.get();
+		Notice notice = this.findById(id);
+		Date readTime = new Date();
+
+		NoticeRead old = this.noticeReadRepository.findByNoticeAndUser(notice, user);
+		if (old == null) {
+			NoticeRead nr = new NoticeRead();
+			nr.setNotice(notice);
+			nr.setReadTime(readTime);
+			nr.setUser(user);
+
+			this.noticeReadRepository.save(nr);
+		}
 	}
 }
