@@ -1,5 +1,8 @@
 # oa_1805
 对J1805专门开放软件仓库，欢迎使用
+# 系统整体架构
+![](https://github.com/fkjava/oa_1805/raw/master/snashots/%E7%B3%BB%E7%BB%9F%E6%95%B4%E4%BD%93%E6%9E%B6%E6%9E%84.png)
+
 # 登录
 ![](https://github.com/fkjava/oa_1805/raw/master/snashots/01-%E7%99%BB%E5%BD%95.png)
 
