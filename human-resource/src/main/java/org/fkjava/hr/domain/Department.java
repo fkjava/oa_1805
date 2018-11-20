@@ -20,7 +20,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 @Entity
-@Table(name = "hr_dept")
+@Table(name = "hr_department")
 public class Department implements Serializable {
 
 	/**

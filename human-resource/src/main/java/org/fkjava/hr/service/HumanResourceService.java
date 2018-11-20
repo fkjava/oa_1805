@@ -1,4 +1,4 @@
-package org.fkjava.hr.controller;
+package org.fkjava.hr.service;
 
 import org.fkjava.hr.domain.Department;
 

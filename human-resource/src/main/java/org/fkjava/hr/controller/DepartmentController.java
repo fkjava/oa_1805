@@ -3,6 +3,7 @@ package org.fkjava.hr.controller;
 import java.util.List;
 
 import org.fkjava.hr.domain.Department;
+import org.fkjava.hr.service.HumanResourceService;
 import org.fkjava.identity.domain.User;
 import org.fkjava.identity.service.IdentityService;
 import org.springframework.beans.factory.annotation.Autowired;
