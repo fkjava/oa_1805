@@ -17,7 +17,7 @@ import org.springframework.stereotype.Service;
 // Spring Security发现内存中有实现了SecurityService的实例，就不会自动创建
 @Service
 public class SecurityServiceImpl implements SecurityService {
-
+	
 	@Autowired
 	private IdentityService identityService;
 
@@ -34,6 +34,7 @@ public class SecurityServiceImpl implements SecurityService {
 			GrantedAuthority ga = new SimpleGrantedAuthority("ROLE_" + role.getRoleKey());
 			authorities.add(ga);
 		});
+
 		UserDetails ud = new UserDetails(user, authorities);
 		return ud;
 	}

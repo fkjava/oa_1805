@@ -41,6 +41,8 @@ public class UserDetails extends org.springframework.security.core.userdetails.U
 	 * 
 	 * @param user        数据库里面存储的User对象
 	 * @param authorities 集合，用户具有的角色、身份。我们在角色的时候有KEY，通常在KEY前面加上ROLE_即可。
+	 * @param menusJson
+	 * @param urls
 	 */
 	public UserDetails(User user, Collection<? extends GrantedAuthority> authorities) {
 		super(user.getLoginName(), user.getPassword(), //

@@ -11,14 +11,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.servlet.ModelAndView;
 
 @Controller
 @RequestMapping("/menu")
+@SessionAttributes("menusJson")
 public class MenuController {
 
 	@Autowired
@@ -66,9 +69,11 @@ public class MenuController {
 	// 返回JSON，使用AJAX来获取
 	@GetMapping(value = "menus", produces = "application/json")
 	@ResponseBody
-	public List<Menu> findMyMenus() {
-		// 找当前用户的菜单
-		return this.menuService.findMyMenus();
+//	public List<Menu> findMyMenus() {
+//		// 找当前用户的菜单
+//		return this.menuService.findMyMenus();
+//	}
+	public String findMyMenus(@ModelAttribute("menusJson") String menusJson) {
+		return menusJson;
 	}
-
 }
