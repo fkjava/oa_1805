@@ -49,15 +49,15 @@ var showToForm = function(treeId, node) {
 	var url = node.url;
 	var type = node.type;
 	var roles = node.roles;
-	
+
 	$(".form-container #id").val(id);
 	$(".form-container #inputName").val(name);
 
-	if(node.manager && node.manager.user){
+	if (node.manager && node.manager.user) {
 		var userId = node.manager.user.id;
 		$(".form-container #selectManager").val(userId);
 	}
-	
+
 	// 处理上级菜单
 	var parentNode = node.getParentNode();
 	if (parentNode) {
@@ -191,8 +191,19 @@ var resetForm = function() {
 	$(".remove-all").click();
 
 };
+
 $(document).ready(function() {
 	$.fn.zTree.init($("#departmentTree"), setting);
 
 	$(".reset-button").click(resetForm);
+
+	// 处理部门经理选择的自动完成
+	$('#selectManager').autocomplete({
+		serviceUrl : contextPath + '/identity/user',
+		dataType : "json",// 返回JSON
+		onSelect : function(suggestion) {
+			// 当选中某个选项的时候要执行的回调，需要把用户的ID存储到表单里面
+			$("#managerUserId").val( suggestion.user.id );
+		}
+	});
 });

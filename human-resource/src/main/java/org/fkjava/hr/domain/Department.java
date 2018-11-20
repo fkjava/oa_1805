@@ -38,6 +38,7 @@ public class Department implements Serializable {
 
 	@ManyToOne()
 	@JoinColumn(name = "parent_id")
+	@JsonIgnore
 	private Department parent;
 
 	@OneToMany(mappedBy = "parent")
