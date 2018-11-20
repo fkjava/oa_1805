@@ -1,5 +1,7 @@
 package org.fkjava.hr.service.impl;
 
+import java.util.List;
+
 import org.fkjava.hr.domain.Department;
 import org.fkjava.hr.domain.Employee;
 import org.fkjava.hr.repository.DepartmentRepository;
@@ -84,5 +86,10 @@ public class HumanResourceServiceImpl implements HumanResourceService {
 		}
 
 		this.departmentRepository.save(department);
+	}
+
+	@Override
+	public List<Department> findTopDepartments() {
+		return this.departmentRepository.findByParentNullOrderByNumber();
 	}
 }

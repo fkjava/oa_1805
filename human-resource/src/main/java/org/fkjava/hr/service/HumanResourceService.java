@@ -1,5 +1,7 @@
 package org.fkjava.hr.service;
 
+import java.util.List;
+
 import org.fkjava.hr.domain.Department;
 
 public interface HumanResourceService {
@@ -10,5 +12,7 @@ public interface HumanResourceService {
 	 * @param department
 	 */
 	void save(Department department);
+
+	List<Department> findTopDepartments();
 
 }

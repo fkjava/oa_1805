@@ -12,6 +12,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
 @Controller
@@ -33,6 +34,13 @@ public class DepartmentController {
 		mav.addObject("user", users);
 
 		return mav;
+	}
+
+	// 如果客户端要求返回JSON的时候，调用下面这个方法
+	@GetMapping(produces = "application/json")
+	@ResponseBody
+	public List<Department> findTopDepartments() {
+		return this.humanResourceService.findTopDepartments();
 	}
 
 	@PostMapping

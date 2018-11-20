@@ -27,6 +27,10 @@
 	<script type="text/javascript" src="${ctx }/static/js/fkjava.js"></script>
 	
 	<sitemesh:write property="head"/>
+
+	<script type="text/javascript">
+		var contextPath = "${ctx}";
+	</script>
   </head>
 
   <body>
@@ -86,9 +90,6 @@
 			</div>
 		</div>
 	</div>
-	<script type="text/javascript">
-		var contextPath = "${ctx}";
-	</script>
 	<script type="text/javascript" src="${ctx }/js/layout.js"></script>
   </body>
 </html>
