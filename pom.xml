@@ -43,5 +43,6 @@
 		<module>security</module>
 		<module>storage</module>
 		<module>call-borad</module>
+		<module>human-resource</module>
 	</modules>
 </project>
