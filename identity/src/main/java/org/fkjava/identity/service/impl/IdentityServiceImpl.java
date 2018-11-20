@@ -134,21 +134,7 @@ public class IdentityServiceImpl implements IdentityService {
 
 	@Override
 	public Page<User> findUsers(String keyword, Integer number) {
-		if (StringUtils.isEmpty(keyword)) {
-			keyword = null;
-		}
-
-		// 分页条件
-		Pageable pageable = PageRequest.of(number, 4);
-
-		Page<User> page;
-		if (keyword == null) {
-			// 分页查询所有数据
-			page = userDao.findAll(pageable);
-		} else {
-			// 根据姓名查询，前后模糊查询
-			page = userDao.findByNameContaining(keyword, pageable);
-		}
+		Page<User> page = this.findUsers(keyword, number, 4);
 		return page;
 	}
 
@@ -196,5 +182,30 @@ public class IdentityServiceImpl implements IdentityService {
 		// 把查询到的User转换为Optional
 		Optional<User> op = Optional.ofNullable(user);
 		return op;
+	}
+
+	@Override
+	public List<User> findUsers(String keyword) {
+		Page<User> page = this.findUsers(keyword, 0, 50);
+		return page.getContent();
+	}
+
+	private Page<User> findUsers(String keyword, Integer number, Integer size) {
+		if (StringUtils.isEmpty(keyword)) {
+			keyword = null;
+		}
+
+		// 分页条件
+		Pageable pageable = PageRequest.of(0, size);
+
+		Page<User> page;
+		if (keyword == null) {
+			// 分页查询所有数据
+			page = userDao.findAll(pageable);
+		} else {
+			// 根据姓名查询，前后模糊查询
+			page = userDao.findByNameContaining(keyword, pageable);
+		}
+		return page;
 	}
 }

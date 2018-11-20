@@ -9,7 +9,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.fkjava.common.data.domain.Result;
-import org.fkjava.identity.UserHolder;
 import org.fkjava.identity.domain.Role;
 import org.fkjava.identity.domain.User;
 import org.fkjava.identity.repository.RoleRepository;
@@ -202,11 +201,12 @@ public class MenuServiceImpl implements MenuService {
 	}
 
 	@Override
-	public List<Menu> findMyMenus() {
+	@Transactional(readOnly = true)
+	public List<Menu> findMyMenus(String userId) {
 		// 从线程里面获取的User，不是持久化对象
-		User user = UserHolder.get();
+		// User user = UserHolder.get();
 		// 从数据库查询持久化的User
-		user = userDao.getOne(user.getId());
+		User user = userDao.getOne(userId);
 		// 得到所有的角色
 		List<Role> roles = user.getRoles();
 
@@ -295,5 +295,21 @@ public class MenuServiceImpl implements MenuService {
 		menu.setChilds(new LinkedList<>());
 
 		return menu;
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public Set<String> findMyUrls(String userId) {
+		// User user = UserHolder.get();
+		User user = userDao.getOne(userId);
+		List<Role> roles = user.getRoles();
+
+		List<Menu> menus = this.menuRepository.findDistinctByRolesIn(roles);// 使用in查询
+
+		Set<String> urls = new HashSet<>();
+		menus.forEach(m -> {
+			urls.add(m.getUrl());
+		});
+		return urls;
 	}
 }
