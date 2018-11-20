@@ -14,11 +14,13 @@ import org.fkjava.menu.service.MenuService;
 import org.fkjava.security.domain.UserDetails;
 import org.fkjava.security.interceptors.UserHolderInterceptor;
 import org.fkjava.security.service.SecurityService;
+import org.fkjava.security.service.impl.MyAccessControl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -139,7 +141,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter implements WebM
 				// 用户的菜单存储到Session里面
 				session.setAttribute("menusJson", menusJson);
 				session.setAttribute("urls", urls);
-				
+
 				// 执行默认的登录成功操作
 				super.onAuthenticationSuccess(request, response, authentication);
 			}
@@ -148,10 +150,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter implements WebM
 				// 登录页面的地址和其他的静态页面都不要权限
 				// /*表示目录下的任何地址，但是不包括子目录
 				// /** 则连同子目录一起匹配
-				.antMatchers(loginPage, "/css/**", "/js/**", "/webjars/**", "/static/**")//
+				.antMatchers(loginPage, "/", "/error/**", "/layout/ex", "/css/**", "/zTree/**", "/js/**", "/webjars/**",
+						"/static/**")//
 				.permitAll()// 不做访问判断
 				.anyRequest()// 所有请求
-				.authenticated()// 授权以后才能访问
+				.access("@myAccessControl.check(authentication,request)")// 自定义检查用户是否有权限访问
+				// .authenticated()// 授权以后才能访问
 				.and()// 并且
 				.formLogin()// 使用表单进行登录
 				.loginPage(loginPage)// 登录页面的位置，默认是/login
@@ -159,7 +163,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter implements WebM
 				// 这个URL是Spring Security使用的，用来接收请求参数、调用Spring Security的鉴权模块
 				.loginProcessingUrl("/security/do-login")// 处理登录请求的URL
 				.successHandler(successHandler)// 登录成功以后的处理器
-				//.defaultSuccessUrl(defaultSuccessUrl)
+				// .defaultSuccessUrl(defaultSuccessUrl)
 				// 在登录成功以后，会判断Session里面是否有记录之前访问的URL，如果有则使用之前的URL继续访问
 				// 如果没有则使用defaultSuccessUrl
 				// .defaultSuccessUrl("/index")//默认的登录成功页面
@@ -189,6 +193,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter implements WebM
 		// 欢迎页，访问根目录重定向到一个首页
 		// registry.addViewController("/").setViewName("security/index");
 		registry.addRedirectViewController("/", "/index");
+	}
+
+	@Bean
+	public MyAccessControl myAccessControl() {
+		return new MyAccessControl();
 	}
 
 	public static void main(String[] args) {
