@@ -47,5 +47,6 @@
 		<module>home-work</module>
 		<module>sms-login</module>
 		<module>disk</module>
+		<module>show</module>
 	</modules>
 </project>
