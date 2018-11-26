@@ -154,8 +154,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter implements WebM
 						"/static/**")//
 				.permitAll()// 不做访问判断
 				.anyRequest()// 所有请求
-				.access("@myAccessControl.check(authentication,request)")// 自定义检查用户是否有权限访问
-				// .authenticated()// 授权以后才能访问
+				.access("authenticated && @myAccessControl.check(authentication,request)")// 自定义检查用户是否有权限访问
+				//.authenticated()// 授权以后才能访问
 				.and()// 并且
 				.formLogin()// 使用表单进行登录
 				.loginPage(loginPage)// 登录页面的位置，默认是/login

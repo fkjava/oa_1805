@@ -14,11 +14,18 @@ public class MyAccessControl {
 	private static final Logger LOG = LoggerFactory.getLogger(MyAccessControl.class);
 
 	public boolean check(Authentication authentication, HttpServletRequest request) {
+
+		String contextPath = request.getContextPath();
+		String requestUri = request.getRequestURI();
+
 		HttpSession session = request.getSession();
 		@SuppressWarnings("unchecked")
 		Set<String> urls = (Set<String>) session.getAttribute("urls");
-		String contextPath = request.getContextPath();
-		String requestUri = request.getRequestURI();
+
+		if (urls == null) {
+			// 当用户没有url的时候，表示还未登录，直接允许访问
+			return true;
+		}
 		if (!contextPath.isEmpty()) {
 			// 如果有contextPath需要截取掉，因为数据库里面记录的URL都没有ContextPath
 			requestUri = requestUri.substring(contextPath.length());
