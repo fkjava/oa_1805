@@ -35,6 +35,10 @@
 		    	placeholder="登录密码" 
 		    	required="required"
 		    	name="password"/>
+		    	
+		    <label>记住登录
+		    	<input type="checkbox" id="rememberme" name="remember-me"/>
+		    </label>
 		    <input type="hidden"
 				name="${_csrf.parameterName}"
 				value="${_csrf.token}"/>

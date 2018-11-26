@@ -30,8 +30,11 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
+import org.springframework.security.web.authentication.RememberMeServices;
 import org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler;
+import org.springframework.security.web.authentication.rememberme.TokenBasedRememberMeServices;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
@@ -50,6 +53,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter implements WebM
 	private SecurityService securityService;
 	@Autowired
 	private PasswordEncoder passwordEncoder;
+	private static final String REMEMBER_KEY = "fkjava.secure.keys";
 
 	@Autowired
 	private MenuService menuService;
@@ -101,6 +105,50 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter implements WebM
 		;
 	}
 
+	@Bean
+	public AuthenticationSuccessHandler successHandler() {
+		SavedRequestAwareAuthenticationSuccessHandler successHandler = new SavedRequestAwareAuthenticationSuccessHandler() {
+
+			@Override
+			public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
+					Authentication authentication) throws IOException, ServletException {
+				UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+
+				postLogin(request, userDetails);
+
+				// 执行默认的登录成功操作
+				super.onAuthenticationSuccess(request, response, authentication);
+			}
+		};
+		return successHandler;
+	};
+
+	/**
+	 * 登录以后，进行一些后处理，用于加载用户专属信息
+	 * 
+	 * @param request
+	 * @param userDetails
+	 */
+	private void postLogin(HttpServletRequest request, UserDetails userDetails) {
+		HttpSession session = request.getSession();
+		// 获取用户有权访问的所有URL
+		Set<String> urls = menuService.findMyUrls(userDetails.getUserId());
+
+		// 获取用户左侧的菜单树
+		List<Menu> menus = menuService.findMyMenus(userDetails.getUserId());
+		// 尝试转换所有菜单为JSON，为了避免每次访问生成一次
+		String menusJson;
+		try {
+			menusJson = objectMapper.writeValueAsString(menus);
+		} catch (JsonProcessingException e) {
+			LOG.error("无法把用户的菜单转换为JSON: " + e.getLocalizedMessage(), e);
+			menusJson = "[]";
+		}
+		// 用户的菜单存储到Session里面
+		session.setAttribute("menusJson", menusJson);
+		session.setAttribute("urls", urls);
+	}
+
 	// 配置基于HTTP的安全控制
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
@@ -117,52 +165,24 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter implements WebM
 				super.onAuthenticationFailure(request, response, exception);
 			}
 		};
-		SavedRequestAwareAuthenticationSuccessHandler successHandler = new SavedRequestAwareAuthenticationSuccessHandler() {
 
-			@Override
-			public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
-					Authentication authentication) throws IOException, ServletException {
-				HttpSession session = request.getSession();
-				UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-
-				// 获取用户有权访问的所有URL
-				Set<String> urls = menuService.findMyUrls(userDetails.getUserId());
-
-				// 获取用户左侧的菜单树
-				List<Menu> menus = menuService.findMyMenus(userDetails.getUserId());
-				// 尝试转换所有菜单为JSON，为了避免每次访问生成一次
-				String menusJson;
-				try {
-					menusJson = objectMapper.writeValueAsString(menus);
-				} catch (JsonProcessingException e) {
-					LOG.error("无法把用户的菜单转换为JSON: " + e.getLocalizedMessage(), e);
-					menusJson = "[]";
-				}
-				// 用户的菜单存储到Session里面
-				session.setAttribute("menusJson", menusJson);
-				session.setAttribute("urls", urls);
-
-				// 执行默认的登录成功操作
-				super.onAuthenticationSuccess(request, response, authentication);
-			}
-		};
 		http.authorizeRequests()// 验证请求
 				// 登录页面的地址和其他的静态页面都不要权限
 				// /*表示目录下的任何地址，但是不包括子目录
 				// /** 则连同子目录一起匹配
-				.antMatchers(loginPage, "/", "/error/**", "/layout/ex", "/css/**", "/zTree/**", "/js/**", "/webjars/**",
-						"/static/**")//
+				.antMatchers(loginPage, "/", "/error/**", "/layout/ex", "/images/**", "/css/**", "/zTree/**", "/js/**",
+						"/webjars/**", "/static/**")//
 				.permitAll()// 不做访问判断
-				.anyRequest()// 所有请求
+				.antMatchers("/index").authenticated()// 授权以后才能访问，但不使用自定义检查
+				.anyRequest()// 其他所有请求
 				.access("authenticated && @myAccessControl.check(authentication,request)")// 自定义检查用户是否有权限访问
-				//.authenticated()// 授权以后才能访问
 				.and()// 并且
 				.formLogin()// 使用表单进行登录
 				.loginPage(loginPage)// 登录页面的位置，默认是/login
 				// 此页面不需要有对应的JSP，而且也不需要有对应代码，只要URL
 				// 这个URL是Spring Security使用的，用来接收请求参数、调用Spring Security的鉴权模块
 				.loginProcessingUrl("/security/do-login")// 处理登录请求的URL
-				.successHandler(successHandler)// 登录成功以后的处理器
+				.successHandler(successHandler())// 登录成功以后的处理器
 				// .defaultSuccessUrl(defaultSuccessUrl)
 				// 在登录成功以后，会判断Session里面是否有记录之前访问的URL，如果有则使用之前的URL继续访问
 				// 如果没有则使用defaultSuccessUrl
@@ -176,7 +196,33 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter implements WebM
 				// .logoutSuccessUrl("/")
 				// .and().httpBasic()// 也可以基于HTTP的标准验证方法（弹出对话框）
 				.and().csrf()// 激活防跨站攻击功能
+				.and().rememberMe()// 记住登录状态
+				.useSecureCookie(true)//
+				.userDetailsService(securityService)//
+				.rememberMeServices(rememberMeServices())//
+				.key(REMEMBER_KEY)//
 		;
+	}
+
+	@Bean
+	public RememberMeServices rememberMeServices() {
+		TokenBasedRememberMeServices rememberMeServices = //
+				new TokenBasedRememberMeServices(REMEMBER_KEY, securityService) {
+					@Override
+					protected UserDetails processAutoLoginCookie(String[] cookieTokens, HttpServletRequest request,
+							HttpServletResponse response) {
+
+						// 根据Cookie自动登录
+						UserDetails userDetails = (UserDetails) super.processAutoLoginCookie(cookieTokens, request,
+								response);
+
+						// 登录成功以后，把用户的菜单和权限获取出来
+						postLogin(request, userDetails);
+
+						return userDetails;
+					}
+				};
+		return rememberMeServices;
 	}
 
 	@Override
