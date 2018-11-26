@@ -44,5 +44,7 @@
 		<module>storage</module>
 		<module>call-borad</module>
 		<module>human-resource</module>
+		<module>home-work</module>
+		<module>sms-login</module>
 	</modules>
 </project>
