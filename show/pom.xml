@@ -79,4 +79,8 @@
 			<optional>true</optional>
 		</dependency>
 	</dependencies>
+
+	<build>
+		<finalName>${project.artifactId}</finalName>
+	</build>
 </project>
