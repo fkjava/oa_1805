@@ -1,4 +1,4 @@
-package org.fkjava.security;
+package org.fkjava.security.controller;
 
 import org.fkjava.common.data.domain.Result;
 import org.springframework.http.HttpStatus;
