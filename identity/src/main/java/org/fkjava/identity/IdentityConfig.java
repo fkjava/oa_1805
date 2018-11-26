@@ -40,7 +40,7 @@ public class IdentityConfig implements WebMvcConfigurer {
 				request.getServletContext().setAttribute("ctx", request.getContextPath());
 				return true;
 			}
-		}).addPathPatterns("/*");
+		}).addPathPatterns("/**");
 	}
 
 	@Bean
