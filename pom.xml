@@ -46,5 +46,6 @@
 		<module>human-resource</module>
 		<module>home-work</module>
 		<module>sms-login</module>
+		<module>disk</module>
 	</modules>
 </project>
