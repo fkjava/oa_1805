@@ -192,7 +192,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter implements WebM
 				// /*表示目录下的任何地址，但是不包括子目录
 				// /** 则连同子目录一起匹配
 				.antMatchers(loginPage, "/error/**", "/layout/ex", "/images/**", "/css/**", "/zTree/**", "/js/**",
-						"/webjars/**", "/static/**")//
+						"/webjars/**", "/static/**", "/disk/register")//
 				.permitAll()// 不做访问判断
 				.antMatchers("/", "/index").authenticated()// 授权以后才能访问，但不使用自定义检查
 				.anyRequest()// 其他所有请求

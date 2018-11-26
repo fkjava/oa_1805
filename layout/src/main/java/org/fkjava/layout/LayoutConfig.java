@@ -63,7 +63,9 @@ public class LayoutConfig implements WebMvcConfigurer {
 				// 带横幅、菜单的布局
 				"/*=/WEB-INF/layouts/main.jsp\n" //
 						// 不带横幅、菜单的布局
-						+ "/security/login=/WEB-INF/layouts/simple.jsp");
+						+ "/security/login=/WEB-INF/layouts/simple.jsp\n"//
+						+ "/disk/register=/WEB-INF/layouts/simple.jsp"//
+		);
 		// 排除某些路径不要装饰
 		// initParameters.put("exclude", "/identity/role,/identity/role/*");
 
