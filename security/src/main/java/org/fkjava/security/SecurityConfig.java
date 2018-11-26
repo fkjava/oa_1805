@@ -1,6 +1,7 @@
 package org.fkjava.security;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.List;
 import java.util.Set;
 
@@ -9,6 +10,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.fkjava.common.data.domain.Result;
 import org.fkjava.menu.domain.Menu;
 import org.fkjava.menu.service.MenuService;
 import org.fkjava.security.domain.UserDetails;
@@ -116,8 +118,17 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter implements WebM
 
 				postLogin(request, userDetails);
 
-				// 执行默认的登录成功操作
-				super.onAuthenticationSuccess(request, response, authentication);
+				String accept = request.getHeader("Accept");
+				if (accept != null && (accept.contains("application/json") || accept.contains("text/javascript"))) {
+					// 返回JSON
+					Result result = Result.ok("登录成功，请引导用户进入首页");
+					response.setContentType("application/json; charset=UTF-8");
+					PrintWriter out = response.getWriter();
+					objectMapper.writeValue(out, result);
+				} else {
+					// 执行默认的登录成功操作
+					super.onAuthenticationSuccess(request, response, authentication);
+				}
 			}
 		};
 		return successHandler;
@@ -161,8 +172,18 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter implements WebM
 			public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response,
 					AuthenticationException exception) throws IOException, ServletException {
 				request.getSession().setAttribute("loginName", request.getParameter("loginName"));
-				// 在重定向之前，先把登录名放Session
-				super.onAuthenticationFailure(request, response, exception);
+
+				String accept = request.getHeader("Accept");
+				if (accept != null && (accept.contains("application/json") || accept.contains("text/javascript"))) {
+					// 返回JSON
+					Result result = Result.error("登录失败，因为：" + exception.getLocalizedMessage());
+					response.setContentType("application/json; charset=UTF-8");
+					PrintWriter out = response.getWriter();
+					objectMapper.writeValue(out, result);
+				} else {
+					// 在重定向之前，先把登录名放Session
+					super.onAuthenticationFailure(request, response, exception);
+				}
 			}
 		};
 
@@ -170,10 +191,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter implements WebM
 				// 登录页面的地址和其他的静态页面都不要权限
 				// /*表示目录下的任何地址，但是不包括子目录
 				// /** 则连同子目录一起匹配
-				.antMatchers(loginPage, "/", "/error/**", "/layout/ex", "/images/**", "/css/**", "/zTree/**", "/js/**",
+				.antMatchers(loginPage, "/error/**", "/layout/ex", "/images/**", "/css/**", "/zTree/**", "/js/**",
 						"/webjars/**", "/static/**")//
 				.permitAll()// 不做访问判断
-				.antMatchers("/index").authenticated()// 授权以后才能访问，但不使用自定义检查
+				.antMatchers("/", "/index").authenticated()// 授权以后才能访问，但不使用自定义检查
 				.anyRequest()// 其他所有请求
 				.access("authenticated && @myAccessControl.check(authentication,request)")// 自定义检查用户是否有权限访问
 				.and()// 并且
@@ -233,8 +254,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter implements WebM
 	@Override
 	public void addViewControllers(ViewControllerRegistry registry) {
 		// 动态注册URL和视图的映射关闭，解决控制器里面几乎没有代码的问题。
-		registry.addViewController("/security/login")//
-				.setViewName("security/login");
+//		registry.addViewController("/security/login")//
+//				.setStatusCode(HttpStatus.UNAUTHORIZED)//
+//				.setViewName("security/login");
+
 		registry.addViewController("/index").setViewName("security/index");
 		// 欢迎页，访问根目录重定向到一个首页
 		// registry.addViewController("/").setViewName("security/index");
