@@ -1,3 +1,20 @@
+-- MySQL dump 10.13  Distrib 5.7.24, for Linux (x86_64)
+--
+-- Host: localhost    Database: j1805_oa
+-- ------------------------------------------------------
+-- Server version	5.7.24-0ubuntu0.18.04.1
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
+/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
+/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
+/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
+/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+
 --
 -- Table structure for table `call_borad_notice`
 --
@@ -87,6 +104,92 @@ INSERT INTO `call_borad_type` VALUES ('4cb7eed0-0bae-4a2c-8ea9-c8513bca0f11','�
 UNLOCK TABLES;
 
 --
+-- Table structure for table `hr_department`
+--
+
+DROP TABLE IF EXISTS `hr_department`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `hr_department` (
+  `id` varchar(36) NOT NULL,
+  `name` varchar(255) DEFAULT NULL,
+  `number` double DEFAULT NULL,
+  `manager_id` varchar(36) DEFAULT NULL,
+  `parent_id` varchar(36) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `FK5i3ts1fhnb2aws3mdj68v7ou` (`manager_id`),
+  KEY `FKdt4sdtabohxwdah2u38y370ie` (`parent_id`),
+  CONSTRAINT `FK5i3ts1fhnb2aws3mdj68v7ou` FOREIGN KEY (`manager_id`) REFERENCES `hr_employee` (`id`),
+  CONSTRAINT `FKdt4sdtabohxwdah2u38y370ie` FOREIGN KEY (`parent_id`) REFERENCES `hr_department` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `hr_department`
+--
+
+LOCK TABLES `hr_department` WRITE;
+/*!40000 ALTER TABLE `hr_department` DISABLE KEYS */;
+INSERT INTO `hr_department` VALUES ('394409f1-5b74-4199-a6d9-e0475e750d76','手机',10000000,'d036698d-3c84-41ca-8b97-5d9c257fd933','78c2a834-8c12-4523-8e0c-1e7e28abdd81'),('62ef42e1-752d-4134-8c07-b24ff349777a','测试部',10000000,'c010cc4d-e881-4baa-b765-79ff37104beb',NULL),('78c2a834-8c12-4523-8e0c-1e7e28abdd81','小米',50000000,'90529b0d-db06-4b97-880d-08d89046302b',NULL),('7a9c19a6-f53f-479c-a29f-eac6c3ca57be','人事部',30000000,'316f936b-291d-433a-a9c0-d7efa02600ea',NULL),('b130b692-5a13-4dec-8c0c-b4fdced69e86','软件开发部',40000000,'90529b0d-db06-4b97-880d-08d89046302b',NULL),('ed57b8a0-5130-48a7-bb4d-11d2f4ef20bf','财务部',20000000,'e09a9bae-4971-4ff0-a766-f9a7607db64b',NULL);
+/*!40000 ALTER TABLE `hr_department` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `hr_employee`
+--
+
+DROP TABLE IF EXISTS `hr_employee`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `hr_employee` (
+  `id` varchar(36) NOT NULL,
+  `join_time` date DEFAULT NULL,
+  `status` varchar(255) DEFAULT NULL,
+  `user_id` varchar(36) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `FKej9l1p52uidr5u882u1dgsdvo` (`user_id`),
+  CONSTRAINT `FKej9l1p52uidr5u882u1dgsdvo` FOREIGN KEY (`user_id`) REFERENCES `id_user` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `hr_employee`
+--
+
+LOCK TABLES `hr_employee` WRITE;
+/*!40000 ALTER TABLE `hr_employee` DISABLE KEYS */;
+INSERT INTO `hr_employee` VALUES ('316f936b-291d-433a-a9c0-d7efa02600ea',NULL,NULL,'2c733000-16b5-4d73-8e6e-da379f2f102b'),('90529b0d-db06-4b97-880d-08d89046302b',NULL,NULL,'3acd0082-3bf3-4ef3-941f-685afa1b2c77'),('c010cc4d-e881-4baa-b765-79ff37104beb',NULL,NULL,'27f1cea1-ca3e-4f92-907e-f468b9d871fd'),('d036698d-3c84-41ca-8b97-5d9c257fd933',NULL,NULL,'7c4075ee-0f8b-4f89-92b6-35b54a5fd9fb'),('e09a9bae-4971-4ff0-a766-f9a7607db64b',NULL,NULL,'28b04736-3d07-48c8-b188-ba44d73bdc5b');
+/*!40000 ALTER TABLE `hr_employee` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `hr_employee_department`
+--
+
+DROP TABLE IF EXISTS `hr_employee_department`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `hr_employee_department` (
+  `department_id` varchar(36) DEFAULT NULL,
+  `employee_id` varchar(36) NOT NULL,
+  PRIMARY KEY (`employee_id`),
+  KEY `FK77ge74gy6gyv95bm69jxqkmsr` (`department_id`),
+  CONSTRAINT `FK77ge74gy6gyv95bm69jxqkmsr` FOREIGN KEY (`department_id`) REFERENCES `hr_department` (`id`),
+  CONSTRAINT `FKim5lehbnxg3eqm91hcfyxr61d` FOREIGN KEY (`employee_id`) REFERENCES `hr_employee` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `hr_employee_department`
+--
+
+LOCK TABLES `hr_employee_department` WRITE;
+/*!40000 ALTER TABLE `hr_employee_department` DISABLE KEYS */;
+INSERT INTO `hr_employee_department` VALUES ('394409f1-5b74-4199-a6d9-e0475e750d76','d036698d-3c84-41ca-8b97-5d9c257fd933'),('62ef42e1-752d-4134-8c07-b24ff349777a','c010cc4d-e881-4baa-b765-79ff37104beb'),('78c2a834-8c12-4523-8e0c-1e7e28abdd81','90529b0d-db06-4b97-880d-08d89046302b'),('7a9c19a6-f53f-479c-a29f-eac6c3ca57be','316f936b-291d-433a-a9c0-d7efa02600ea'),('ed57b8a0-5130-48a7-bb4d-11d2f4ef20bf','e09a9bae-4971-4ff0-a766-f9a7607db64b');
+/*!40000 ALTER TABLE `hr_employee_department` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `id_role`
 --
 
@@ -137,7 +240,7 @@ CREATE TABLE `id_user` (
 
 LOCK TABLES `id_user` WRITE;
 /*!40000 ALTER TABLE `id_user` DISABLE KEYS */;
-INSERT INTO `id_user` VALUES ('27f1cea1-ca3e-4f92-907e-f468b9d871fd','guanyu','肖大大','$2a$10$nUMi2gKnXYn4wS7Mo0yuUusLUkyzY7H/hH5nQ6I23lNBlcPsMnZ02','2019-01-12 19:59:53.002000','NORMAL'),('28b04736-3d07-48c8-b188-ba44d73bdc5b','luochunlong','罗春龙','{S}$e0801$WrVY+15rUpAvx7y1RoKwdex9YbwLoJaPg5+FfIPMdt7Z5iY8JTLyrydYxSjyElg+TxlMQeA1qN8qz7yjk1PvCA==$p1J4p/N4VzGzRERzhNzuf+sxlS5+4yu+FBoIzMeNcy8=','2019-01-18 00:37:34.420000','NORMAL'),('2c733000-16b5-4d73-8e6e-da379f2f102b','ligang','李刚','{S}$e0801$kiRuKp/k1MYYMFmzBpaCrJZcbXN2AIYIEMkl+a6TGcJqwqIjwjwamkL+XtjZ71mC4IEXanzOr90NH4EgPmtxjg==$zCL9yLhVewSkJ/Fjcu0uqlkUx09zEjXoOWtDrF2+YCI=','2019-01-06 00:52:06.709000','NORMAL'),('3acd0082-3bf3-4ef3-941f-685afa1b2c77','leijun','雷军','{S}$e0801$NHoo7wLr8iGQ6GntlyOpWVEFVkUltOZMQww+taev/uQQY+pyC9TWm3AmOrqQzZCGU0LNFtMn7K4tpl9NgCyNhw==$ApbvvSTXaWyzBEVgBfZQX1kmhhmtZfhbCL2iyk2H3Vs=','2019-01-06 00:55:48.342000','NORMAL'),('70090976-0803-4acb-8a56-7fa8072a2529','huangyong','黄勇','asdf','2019-01-06 00:01:19.105000','DISABLED'),('771fd3ad-10a0-40bc-88ec-071e3180adfc','lwq','罗文强','1234','2019-01-06 00:06:05.028000','NORMAL'),('7c4075ee-0f8b-4f89-92b6-35b54a5fd9fb','liuqiangdong','刘强东','1234','2019-01-06 00:01:28.954000','NORMAL'),('8c34643b-f39f-4caf-a5ee-1541a3fec156','linus','林纳斯','1234','2019-01-06 00:02:24.527000','NORMAL'),('9dfd2c95-577f-41e0-944d-c80772055b36','bill','比尔','1234','2019-01-06 00:04:48.812000','NORMAL'),('9e97fe45-0311-447b-871d-a75376b8e026','wanglaoji','王老吉','1234','2019-01-06 00:02:14.041000','NORMAL'),('b696e71c-0424-4cb4-917b-fe087303e58f','zengyunyang','曾运扬','1234','2019-01-06 00:06:23.057000','NORMAL'),('f8dbdb40-0f44-4723-aea4-a878f0f1859d','mayun','马云','1234','2019-01-06 00:02:11.953000','NORMAL'),('f9fcaa4c-0242-440a-a5a3-e17e672f587a','jobs','乔布斯','1234','2019-01-06 00:01:47.336000','NORMAL');
+INSERT INTO `id_user` VALUES ('21024043-bd11-42e7-b595-d2ffcd4cd117','user5','user5','{S}$e0801$RbkEIXgxqFEiqiLfbvf6LJNXJ+Qg4JsvRu4s4yR875Hv2/Q2LEm2KbTOBJhMniXL718Acggala8h44QrPabvXA==$6MFfCpn1aPLSnogZqMxAyjAw2efyoFp0Ec46vTrUQIc=','2019-01-26 02:34:45.963000','NORMAL'),('27f1cea1-ca3e-4f92-907e-f468b9d871fd','guanyu','肖大大','$2a$10$nUMi2gKnXYn4wS7Mo0yuUusLUkyzY7H/hH5nQ6I23lNBlcPsMnZ02','2019-01-12 19:59:53.002000','NORMAL'),('28b04736-3d07-48c8-b188-ba44d73bdc5b','luochunlong','罗春龙','{S}$e0801$WrVY+15rUpAvx7y1RoKwdex9YbwLoJaPg5+FfIPMdt7Z5iY8JTLyrydYxSjyElg+TxlMQeA1qN8qz7yjk1PvCA==$p1J4p/N4VzGzRERzhNzuf+sxlS5+4yu+FBoIzMeNcy8=','2019-01-18 00:37:34.420000','NORMAL'),('2c733000-16b5-4d73-8e6e-da379f2f102b','ligang','李刚','{S}$e0801$kiRuKp/k1MYYMFmzBpaCrJZcbXN2AIYIEMkl+a6TGcJqwqIjwjwamkL+XtjZ71mC4IEXanzOr90NH4EgPmtxjg==$zCL9yLhVewSkJ/Fjcu0uqlkUx09zEjXoOWtDrF2+YCI=','2019-01-06 00:52:06.709000','NORMAL'),('3acd0082-3bf3-4ef3-941f-685afa1b2c77','leijun','雷军','{S}$e0801$NHoo7wLr8iGQ6GntlyOpWVEFVkUltOZMQww+taev/uQQY+pyC9TWm3AmOrqQzZCGU0LNFtMn7K4tpl9NgCyNhw==$ApbvvSTXaWyzBEVgBfZQX1kmhhmtZfhbCL2iyk2H3Vs=','2019-01-06 00:55:48.342000','NORMAL'),('676a14eb-4858-4daa-a9db-54ac32957be9','user3','user3','{S}$e0801$h4mU4ctGDZ70qxJ+TqjYDNLzLZ+jr0yKjsunLphNLRjjNGdaZpf+oUYsVBbRzUzeoXAOc2YjleUCsyKdv/tgnw==$7EDAuWpQQBtBHwnCClvoi+q73oC/++80RvpHVX07Kxk=','2019-01-26 02:33:08.729000','NORMAL'),('6cc3d7d4-0ae2-472f-a044-9a69655f3d8d','user4','user4','{S}$e0801$2wZtKbB/gmIZkBwex4j3HWOssUzSoyPi4R5V6SeTDoC7kCwplu0Rd+JataIFI12AnccjDF/QUqHJ0NkJhoBvIg==$PJHWpHmZIpHn8iPJxUyp9XQKA0HCS2jw1FyIqjaqvQQ=','2019-01-26 02:34:29.511000','NORMAL'),('70090976-0803-4acb-8a56-7fa8072a2529','huangyong','黄勇','asdf','2019-01-06 00:01:19.105000','DISABLED'),('771fd3ad-10a0-40bc-88ec-071e3180adfc','lwq','罗文强','1234','2019-01-06 00:06:05.028000','NORMAL'),('7c4075ee-0f8b-4f89-92b6-35b54a5fd9fb','liuqiangdong','刘强东','1234','2019-01-06 00:01:28.954000','NORMAL'),('8c34643b-f39f-4caf-a5ee-1541a3fec156','linus','林纳斯','1234','2019-01-06 00:02:24.527000','NORMAL'),('8ed69512-21e8-4b74-a403-b6dc50dca8be','user1','user1','{S}$e0801$bDLeYVOiR5/6bVto3o4BFF4pl0KqX5Gf2KGlV+NOLCykaVyEY82slSMHG8FiQte6z/r43NSWT8+N6ifPWKetJg==$XOlTO8eWOgld8ITCebRdcjSFbWBSOXWlirqYuuAxI/c=','2019-01-26 02:31:43.444000','NORMAL'),('9dfd2c95-577f-41e0-944d-c80772055b36','bill','比尔','1234','2019-01-06 00:04:48.812000','NORMAL'),('9e97fe45-0311-447b-871d-a75376b8e026','wanglaoji','王老吉','1234','2019-01-06 00:02:14.041000','NORMAL'),('b696e71c-0424-4cb4-917b-fe087303e58f','zengyunyang','曾运扬','1234','2019-01-06 00:06:23.057000','NORMAL'),('c356301b-e4ad-4305-950e-b4acb2bd404c','lwq3','罗文强3','{S}$e0801$q8FgZcwBkhwo5OPvhW1YZS6lFhk9adXpY5MadHfJPZ6W+vvsndPiJMnDZHC9b7P5EueD9oOhNslf+Q5LE+rnYA==$C42dleoV3c6L/PMZYJCDeMXu1Aarg/5SEnOvsrBsmAw=','2019-01-26 02:25:15.673000','NORMAL'),('cfbc234f-4cdf-4c6b-ace5-5a5e3d7a2879','lwq4','罗文强4','{S}$e0801$uUyZpQuacJ8V8LUjXGc1rJyNwgFldtyxAPmmnQbbvbqVbOWmP3djKEmfmS7q9854CYEhhBfG3MKA8M8brDnBAA==$Oxih0xTLHg8DFwEinto6khjrcLUSHa7dvaO5/Oobh/o=','2019-01-26 02:27:22.331000','NORMAL'),('f8dbdb40-0f44-4723-aea4-a878f0f1859d','mayun','马云','1234','2019-01-06 00:02:11.953000','NORMAL'),('f9fcaa4c-0242-440a-a5a3-e17e672f587a','jobs','乔布斯','1234','2019-01-06 00:01:47.336000','NORMAL');
 /*!40000 ALTER TABLE `id_user` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -164,7 +267,7 @@ CREATE TABLE `id_user_roles` (
 
 LOCK TABLES `id_user_roles` WRITE;
 /*!40000 ALTER TABLE `id_user_roles` DISABLE KEYS */;
-INSERT INTO `id_user_roles` VALUES ('b696e71c-0424-4cb4-917b-fe087303e58f','cead9252-1f7d-4ac2-adfa-b447b8c5e0be'),('2c733000-16b5-4d73-8e6e-da379f2f102b','cead9252-1f7d-4ac2-adfa-b447b8c5e0be'),('3acd0082-3bf3-4ef3-941f-685afa1b2c77','cead9252-1f7d-4ac2-adfa-b447b8c5e0be'),('27f1cea1-ca3e-4f92-907e-f468b9d871fd','45e1f633-fede-4635-9b54-b42259dfa082'),('27f1cea1-ca3e-4f92-907e-f468b9d871fd','252401e8-dca3-4015-976c-0cf99b2349b3'),('27f1cea1-ca3e-4f92-907e-f468b9d871fd','cead9252-1f7d-4ac2-adfa-b447b8c5e0be'),('28b04736-3d07-48c8-b188-ba44d73bdc5b','2558d20d-aabe-4f16-8845-69fb50a9e6dd'),('28b04736-3d07-48c8-b188-ba44d73bdc5b','45e1f633-fede-4635-9b54-b42259dfa082'),('28b04736-3d07-48c8-b188-ba44d73bdc5b','cead9252-1f7d-4ac2-adfa-b447b8c5e0be');
+INSERT INTO `id_user_roles` VALUES ('b696e71c-0424-4cb4-917b-fe087303e58f','cead9252-1f7d-4ac2-adfa-b447b8c5e0be'),('2c733000-16b5-4d73-8e6e-da379f2f102b','cead9252-1f7d-4ac2-adfa-b447b8c5e0be'),('3acd0082-3bf3-4ef3-941f-685afa1b2c77','cead9252-1f7d-4ac2-adfa-b447b8c5e0be'),('27f1cea1-ca3e-4f92-907e-f468b9d871fd','45e1f633-fede-4635-9b54-b42259dfa082'),('27f1cea1-ca3e-4f92-907e-f468b9d871fd','252401e8-dca3-4015-976c-0cf99b2349b3'),('27f1cea1-ca3e-4f92-907e-f468b9d871fd','cead9252-1f7d-4ac2-adfa-b447b8c5e0be'),('28b04736-3d07-48c8-b188-ba44d73bdc5b','2558d20d-aabe-4f16-8845-69fb50a9e6dd'),('28b04736-3d07-48c8-b188-ba44d73bdc5b','45e1f633-fede-4635-9b54-b42259dfa082'),('28b04736-3d07-48c8-b188-ba44d73bdc5b','cead9252-1f7d-4ac2-adfa-b447b8c5e0be'),('c356301b-e4ad-4305-950e-b4acb2bd404c','cead9252-1f7d-4ac2-adfa-b447b8c5e0be'),('cfbc234f-4cdf-4c6b-ace5-5a5e3d7a2879','cead9252-1f7d-4ac2-adfa-b447b8c5e0be'),('8ed69512-21e8-4b74-a403-b6dc50dca8be','cead9252-1f7d-4ac2-adfa-b447b8c5e0be'),('676a14eb-4858-4daa-a9db-54ac32957be9','cead9252-1f7d-4ac2-adfa-b447b8c5e0be'),('6cc3d7d4-0ae2-472f-a044-9a69655f3d8d','cead9252-1f7d-4ac2-adfa-b447b8c5e0be'),('21024043-bd11-42e7-b595-d2ffcd4cd117','cead9252-1f7d-4ac2-adfa-b447b8c5e0be');
 /*!40000 ALTER TABLE `id_user_roles` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -194,7 +297,7 @@ CREATE TABLE `menu` (
 
 LOCK TABLES `menu` WRITE;
 /*!40000 ALTER TABLE `menu` DISABLE KEYS */;
-INSERT INTO `menu` VALUES ('02e37861-3ad8-466c-96e9-83c8dd578657','通用服务',80000000,'LINK','#',NULL),('06169502-a4ae-4914-a67d-99da1366dd73','角色管理',30000000,'LINK','/identity/role','efa6367f-f8e6-4501-aef8-274a60c00281'),('06dee100-498e-49ff-ad12-dedf3c8b1fc7','假期类型',10000000,'LINK','/leave/type','d103320c-1df6-4d34-91a7-846e91f7f89f'),('1655ba9a-8062-439a-916c-2f451e27c2d2','详情/修改',20000000,'BUTTON','/identity/user/[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}','d4a0807c-d0bd-4f7a-bcc6-922c6e5c0b2c'),('28bdd4b7-ea0f-4f1c-9377-e025a1e68721','添加',10000000,'BUTTON','/identity/user/add','d4a0807c-d0bd-4f7a-bcc6-922c6e5c0b2c'),('2fa226ff-64a2-4bbc-8497-235cf74f02fc','请假',20000000,'LINK','/leave','d103320c-1df6-4d34-91a7-846e91f7f89f'),('4cc22f15-c12f-478d-bb96-7b32a54a50bc','删除菜单',20000000,'BUTTON','/menu/[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}','536b02d4-16b3-4775-8a11-d4dc57fba12b'),('536b02d4-16b3-4775-8a11-d4dc57fba12b','菜单',20000000,'LINK','/menu','efa6367f-f8e6-4501-aef8-274a60c00281'),('644383d7-6543-4330-a2b3-650cdd949728','文件管理',10000000,'LINK','/storage/file','02e37861-3ad8-466c-96e9-83c8dd578657'),('bf49456a-7f06-4a45-bff4-8396b0e38136','公告管理',20000000,'LINK','/notice','def76eef-251d-4206-a651-ed5f5a917daa'),('bf724302-a73b-4f37-9690-fdc9b778c58a','绩效',30000000,'LINK','#','d103320c-1df6-4d34-91a7-846e91f7f89f'),('cae689bd-0aa8-4a92-8085-2734a2f9d16d','资产',70000000,'LINK','#',NULL),('cdbc6e63-fdb1-48d4-a4ee-64130d3e8d4d','财务',30000000,'LINK','#',NULL),('ce669646-44b4-411d-8118-2928a1c76431','移动菜单',10000000,'BUTTON','/menu/move','536b02d4-16b3-4775-8a11-d4dc57fba12b'),('d103320c-1df6-4d34-91a7-846e91f7f89f','人事',20000000,'LINK','#',NULL),('d4a0807c-d0bd-4f7a-bcc6-922c6e5c0b2c','用户管理',10000000,'LINK','/identity/user','efa6367f-f8e6-4501-aef8-274a60c00281'),('def76eef-251d-4206-a651-ed5f5a917daa','公告',50000000,'LINK','#',NULL),('e86e412e-5584-4e78-ac39-65cdca2b5dab','公告类型',10000000,'LINK','/notice/type','def76eef-251d-4206-a651-ed5f5a917daa'),('efa6367f-f8e6-4501-aef8-274a60c00281','系统管理',10000000,'LINK','#',NULL),('fa1a9ab8-3e03-49ce-92d7-094eed9e8f21','流程',40000000,'LINK','#',NULL);
+INSERT INTO `menu` VALUES ('02e37861-3ad8-466c-96e9-83c8dd578657','通用服务',80000000,'LINK','#',NULL),('06169502-a4ae-4914-a67d-99da1366dd73','角色管理',30000000,'LINK','/identity/role','efa6367f-f8e6-4501-aef8-274a60c00281'),('06dee100-498e-49ff-ad12-dedf3c8b1fc7','假期类型',10000000,'LINK','/leave/type','d103320c-1df6-4d34-91a7-846e91f7f89f'),('1655ba9a-8062-439a-916c-2f451e27c2d2','详情/修改',20000000,'BUTTON','/identity/user/[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}','d4a0807c-d0bd-4f7a-bcc6-922c6e5c0b2c'),('28bdd4b7-ea0f-4f1c-9377-e025a1e68721','添加',10000000,'BUTTON','/identity/user/add','d4a0807c-d0bd-4f7a-bcc6-922c6e5c0b2c'),('2fa226ff-64a2-4bbc-8497-235cf74f02fc','请假',20000000,'LINK','/leave','d103320c-1df6-4d34-91a7-846e91f7f89f'),('4cc22f15-c12f-478d-bb96-7b32a54a50bc','删除菜单',20000000,'BUTTON','/menu/[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}','536b02d4-16b3-4775-8a11-d4dc57fba12b'),('536b02d4-16b3-4775-8a11-d4dc57fba12b','菜单',20000000,'LINK','/menu','efa6367f-f8e6-4501-aef8-274a60c00281'),('644383d7-6543-4330-a2b3-650cdd949728','文件管理',10000000,'LINK','/storage/file','02e37861-3ad8-466c-96e9-83c8dd578657'),('6f1d7302-17e1-431c-8d62-b0cea75e3ec2','查询当前用户的菜单',30000000,'BUTTON','/menu/menus','536b02d4-16b3-4775-8a11-d4dc57fba12b'),('82db2c52-dc7d-4a1f-81cc-f54eecc5df12','部门管理',5000000,'LINK','/human-resource/department','d103320c-1df6-4d34-91a7-846e91f7f89f'),('bf49456a-7f06-4a45-bff4-8396b0e38136','公告管理',20000000,'LINK','/notice','def76eef-251d-4206-a651-ed5f5a917daa'),('bf724302-a73b-4f37-9690-fdc9b778c58a','绩效',30000000,'LINK','#','d103320c-1df6-4d34-91a7-846e91f7f89f'),('cae689bd-0aa8-4a92-8085-2734a2f9d16d','资产',70000000,'LINK','#',NULL),('cdbc6e63-fdb1-48d4-a4ee-64130d3e8d4d','财务',30000000,'LINK','#',NULL),('ce669646-44b4-411d-8118-2928a1c76431','移动菜单',10000000,'BUTTON','/menu/move','536b02d4-16b3-4775-8a11-d4dc57fba12b'),('d103320c-1df6-4d34-91a7-846e91f7f89f','人事',20000000,'LINK','#',NULL),('d4a0807c-d0bd-4f7a-bcc6-922c6e5c0b2c','用户管理',10000000,'LINK','/identity/user','efa6367f-f8e6-4501-aef8-274a60c00281'),('def76eef-251d-4206-a651-ed5f5a917daa','公告',50000000,'LINK','#',NULL),('e86e412e-5584-4e78-ac39-65cdca2b5dab','公告类型',10000000,'LINK','/notice/type','def76eef-251d-4206-a651-ed5f5a917daa'),('efa6367f-f8e6-4501-aef8-274a60c00281','系统管理',10000000,'LINK','#',NULL),('fa1a9ab8-3e03-49ce-92d7-094eed9e8f21','流程',40000000,'LINK','#',NULL);
 /*!40000 ALTER TABLE `menu` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -221,7 +324,7 @@ CREATE TABLE `menu_roles` (
 
 LOCK TABLES `menu_roles` WRITE;
 /*!40000 ALTER TABLE `menu_roles` DISABLE KEYS */;
-INSERT INTO `menu_roles` VALUES ('d4a0807c-d0bd-4f7a-bcc6-922c6e5c0b2c','45e1f633-fede-4635-9b54-b42259dfa082'),('28bdd4b7-ea0f-4f1c-9377-e025a1e68721','45e1f633-fede-4635-9b54-b42259dfa082'),('efa6367f-f8e6-4501-aef8-274a60c00281','45e1f633-fede-4635-9b54-b42259dfa082'),('d103320c-1df6-4d34-91a7-846e91f7f89f','cead9252-1f7d-4ac2-adfa-b447b8c5e0be'),('cdbc6e63-fdb1-48d4-a4ee-64130d3e8d4d','cead9252-1f7d-4ac2-adfa-b447b8c5e0be'),('fa1a9ab8-3e03-49ce-92d7-094eed9e8f21','cead9252-1f7d-4ac2-adfa-b447b8c5e0be'),('def76eef-251d-4206-a651-ed5f5a917daa','cead9252-1f7d-4ac2-adfa-b447b8c5e0be'),('06dee100-498e-49ff-ad12-dedf3c8b1fc7','45e1f633-fede-4635-9b54-b42259dfa082'),('2fa226ff-64a2-4bbc-8497-235cf74f02fc','cead9252-1f7d-4ac2-adfa-b447b8c5e0be'),('536b02d4-16b3-4775-8a11-d4dc57fba12b','45e1f633-fede-4635-9b54-b42259dfa082'),('ce669646-44b4-411d-8118-2928a1c76431','45e1f633-fede-4635-9b54-b42259dfa082'),('4cc22f15-c12f-478d-bb96-7b32a54a50bc','45e1f633-fede-4635-9b54-b42259dfa082'),('1655ba9a-8062-439a-916c-2f451e27c2d2','45e1f633-fede-4635-9b54-b42259dfa082'),('cae689bd-0aa8-4a92-8085-2734a2f9d16d','2558d20d-aabe-4f16-8845-69fb50a9e6dd'),('cae689bd-0aa8-4a92-8085-2734a2f9d16d','cead9252-1f7d-4ac2-adfa-b447b8c5e0be'),('bf724302-a73b-4f37-9690-fdc9b778c58a','2558d20d-aabe-4f16-8845-69fb50a9e6dd'),('06169502-a4ae-4914-a67d-99da1366dd73','45e1f633-fede-4635-9b54-b42259dfa082'),('644383d7-6543-4330-a2b3-650cdd949728','cead9252-1f7d-4ac2-adfa-b447b8c5e0be'),('e86e412e-5584-4e78-ac39-65cdca2b5dab','45e1f633-fede-4635-9b54-b42259dfa082'),('e86e412e-5584-4e78-ac39-65cdca2b5dab','252401e8-dca3-4015-976c-0cf99b2349b3'),('bf49456a-7f06-4a45-bff4-8396b0e38136','45e1f633-fede-4635-9b54-b42259dfa082'),('bf49456a-7f06-4a45-bff4-8396b0e38136','cead9252-1f7d-4ac2-adfa-b447b8c5e0be');
+INSERT INTO `menu_roles` VALUES ('d4a0807c-d0bd-4f7a-bcc6-922c6e5c0b2c','45e1f633-fede-4635-9b54-b42259dfa082'),('28bdd4b7-ea0f-4f1c-9377-e025a1e68721','45e1f633-fede-4635-9b54-b42259dfa082'),('efa6367f-f8e6-4501-aef8-274a60c00281','45e1f633-fede-4635-9b54-b42259dfa082'),('d103320c-1df6-4d34-91a7-846e91f7f89f','cead9252-1f7d-4ac2-adfa-b447b8c5e0be'),('cdbc6e63-fdb1-48d4-a4ee-64130d3e8d4d','cead9252-1f7d-4ac2-adfa-b447b8c5e0be'),('fa1a9ab8-3e03-49ce-92d7-094eed9e8f21','cead9252-1f7d-4ac2-adfa-b447b8c5e0be'),('def76eef-251d-4206-a651-ed5f5a917daa','cead9252-1f7d-4ac2-adfa-b447b8c5e0be'),('06dee100-498e-49ff-ad12-dedf3c8b1fc7','45e1f633-fede-4635-9b54-b42259dfa082'),('2fa226ff-64a2-4bbc-8497-235cf74f02fc','cead9252-1f7d-4ac2-adfa-b447b8c5e0be'),('536b02d4-16b3-4775-8a11-d4dc57fba12b','45e1f633-fede-4635-9b54-b42259dfa082'),('ce669646-44b4-411d-8118-2928a1c76431','45e1f633-fede-4635-9b54-b42259dfa082'),('4cc22f15-c12f-478d-bb96-7b32a54a50bc','45e1f633-fede-4635-9b54-b42259dfa082'),('1655ba9a-8062-439a-916c-2f451e27c2d2','45e1f633-fede-4635-9b54-b42259dfa082'),('cae689bd-0aa8-4a92-8085-2734a2f9d16d','2558d20d-aabe-4f16-8845-69fb50a9e6dd'),('cae689bd-0aa8-4a92-8085-2734a2f9d16d','cead9252-1f7d-4ac2-adfa-b447b8c5e0be'),('bf724302-a73b-4f37-9690-fdc9b778c58a','2558d20d-aabe-4f16-8845-69fb50a9e6dd'),('06169502-a4ae-4914-a67d-99da1366dd73','45e1f633-fede-4635-9b54-b42259dfa082'),('644383d7-6543-4330-a2b3-650cdd949728','cead9252-1f7d-4ac2-adfa-b447b8c5e0be'),('e86e412e-5584-4e78-ac39-65cdca2b5dab','45e1f633-fede-4635-9b54-b42259dfa082'),('e86e412e-5584-4e78-ac39-65cdca2b5dab','252401e8-dca3-4015-976c-0cf99b2349b3'),('bf49456a-7f06-4a45-bff4-8396b0e38136','45e1f633-fede-4635-9b54-b42259dfa082'),('bf49456a-7f06-4a45-bff4-8396b0e38136','cead9252-1f7d-4ac2-adfa-b447b8c5e0be'),('6f1d7302-17e1-431c-8d62-b0cea75e3ec2','cead9252-1f7d-4ac2-adfa-b447b8c5e0be'),('82db2c52-dc7d-4a1f-81cc-f54eecc5df12','2558d20d-aabe-4f16-8845-69fb50a9e6dd');
 /*!40000 ALTER TABLE `menu_roles` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -265,4 +368,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2018-11-18 15:56:40
+-- Dump completed on 2018-11-28  9:58:24
