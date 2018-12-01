@@ -20,8 +20,11 @@ import javax.persistence.TemporalType;
 
 import org.hibernate.annotations.GenericGenerator;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 @Entity
 @Table(name = "id_user")
+@JsonIgnoreProperties({ "password", "roles", "expiredTime" })
 public class User implements Serializable {
 
 	/**

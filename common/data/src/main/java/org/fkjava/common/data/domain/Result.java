@@ -34,6 +34,10 @@ public class Result {
 		return r;
 	}
 
+	public int getStatus() {
+		return code;
+	}
+
 	public int getCode() {
 		return code;
 	}
