@@ -43,6 +43,10 @@ public class FileInfo implements Serializable {
 	// 实际文件的存储路径，相对于文件存储目录的路径
 	private String path;
 
+	// 文件的指纹，使用SHA-256算法计算整个文件的内容来得到
+	@Column(length = 256)
+	private String fingerprint;
+
 	public String getId() {
 		return id;
 	}
@@ -97,5 +101,13 @@ public class FileInfo implements Serializable {
 
 	public void setPath(String path) {
 		this.path = path;
+	}
+
+	public String getFingerprint() {
+		return fingerprint;
+	}
+
+	public void setFingerprint(String fingerprint) {
+		this.fingerprint = fingerprint;
 	}
 }

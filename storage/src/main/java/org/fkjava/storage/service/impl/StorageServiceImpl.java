@@ -1,16 +1,18 @@
 package org.fkjava.storage.service.impl;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.Date;
 import java.util.UUID;
 
 import org.fkjava.common.data.domain.Result;
+import org.fkjava.common.data.utils.Checksum;
 import org.fkjava.identity.UserHolder;
 import org.fkjava.identity.domain.User;
 import org.fkjava.storage.domain.FileInfo;
@@ -57,12 +59,26 @@ public class StorageServiceImpl implements StorageService {
 			file.getParentFile().mkdirs();
 		}
 		LOG.trace("文件的实际存储路径： {}", file.getAbsolutePath());
-		Path target = file.toPath();
-		try {
-			Files.copy(in, target);
+		// Path target = file.toPath();
+		Checksum.Builder builder = Checksum.builder("SHA-256");
+		try (BufferedInputStream bis = new BufferedInputStream(in);
+				FileOutputStream fos = new FileOutputStream(file);
+				BufferedOutputStream bos = new BufferedOutputStream(fos)) {
+			// Files.copy(in, target);
+			byte[] b = new byte[1024];
+			for (int len = bis.read(b); len != -1; len = bis.read(b)) {
+				// 写出数据到文件
+				bos.write(b, 0, len);
+				// 更新数据摘要
+				builder.update(b, 0, len);
+			}
 		} catch (IOException e) {
 			throw new RuntimeException("保存文件到硬盘失败：" + e.getLocalizedMessage(), e);
 		}
+		// 计算文件指纹
+		String fingerprint = builder.sum();
+
+		info.setFingerprint(fingerprint);
 
 		// 保存文件信息
 		info.setOwner(UserHolder.get());
