@@ -194,7 +194,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter implements WebM
 				.antMatchers(loginPage, "/error/**", "/layout/ex", "/images/**", "/css/**", "/zTree/**", "/js/**",
 						"/webjars/**", "/static/**", "/disk/register")//
 				.permitAll()// 不做访问判断
-				.antMatchers("/", "/index").authenticated()// 授权以后才能访问，但不使用自定义检查
+				.antMatchers("/", "/index", "/identity/profile").authenticated()// 授权以后才能访问，但不使用自定义检查
 				.anyRequest()// 其他所有请求
 				.access("authenticated && @myAccessControl.check(authentication,request)")// 自定义检查用户是否有权限访问
 				.and()// 并且
@@ -216,7 +216,33 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter implements WebM
 				.logoutUrl("/security/do-logout")
 				// .logoutSuccessUrl("/")
 				// .and().httpBasic()// 也可以基于HTTP的标准验证方法（弹出对话框）
-				.and().csrf()// 激活防跨站攻击功能
+				.and().csrf()//
+				.ignoringRequestMatchers((request) -> {
+					String method = request.getMethod();
+					if ("GET".equals(method)) {
+						LOG.trace("GET请求，不需要CSRF防护");
+						return false;
+					}
+					String uri = request.getRequestURI();
+					if (uri.endsWith(".json") || uri.endsWith(".xml")) {
+						LOG.trace("URL以.json或者.xml结尾，无须CSRF防护");
+						return true;
+					}
+
+					String accept = request.getHeader("Accept");
+					if (accept == null) {
+						LOG.trace("没有Accept请求头，需要CSRF防护");
+						return false;
+					} else if (accept.startsWith("application/json") //
+							|| accept.startsWith("application/xml")//
+							|| accept.startsWith("text/xml")) {
+						LOG.trace("Accept请求头声明要求返回JSON或者XML，无须CSRF防护");
+						return true;
+					} else {
+						LOG.trace("需要CSRF防护");
+						return false;
+					}
+				})// 激活防跨站攻击功能
 				.and().rememberMe()// 记住登录状态
 				.useSecureCookie(true)//
 				.userDetailsService(securityService)//
