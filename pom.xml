@@ -48,5 +48,6 @@
 		<module>sms-login</module>
 		<module>disk</module>
 		<module>show</module>
+		<module>workflow</module>
 	</modules>
 </project>
