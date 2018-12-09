@@ -12,44 +12,18 @@ import org.activiti.engine.TaskService;
 import org.activiti.spring.ProcessEngineFactoryBean;
 import org.activiti.spring.SpringProcessEngineConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.jdbc.datasource.DataSourceTransactionManager;
-import org.springframework.jdbc.datasource.SimpleDriverDataSource;
 import org.springframework.transaction.PlatformTransactionManager;
 
-import com.mysql.cj.jdbc.Driver;
-
-@Configuration // 如果要换成Spring Boot，只需要修改此行，然后加个main方法
+@SpringBootApplication
 @ComponentScan("org.fkjava")
 public class WorkflowConfig {
 
-//	 <bean id="dataSource" class="org.springframework.jdbc.datasource.SimpleDriverDataSource">
-//	    <property name="driverClass" value="org.h2.Driver" />
-//	    <property name="url" value="jdbc:h2:mem:activiti;DB_CLOSE_DELAY=1000" />
-//	    <property name="username" value="sa" />
-//	    <property name="password" value="" />
-//	  </bean>
-	@Bean
-	public DataSource dataSource() {
-		SimpleDriverDataSource ds = new SimpleDriverDataSource();
-		ds.setDriverClass(Driver.class);
-		ds.setUrl("jdbc:mysql://127.0.0.1:3306/J1805_oa?useSSL=false");
-		ds.setUsername("root");
-		ds.setPassword("1234");
-
-		return ds;
-	}
-
-//	  <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
-//	    <property name="dataSource" ref="dataSource" />
-//	  </bean>
-	@Bean
-	public PlatformTransactionManager transactionManager(@Autowired DataSource dataSource) {
-		DataSourceTransactionManager tx = new DataSourceTransactionManager();
-		tx.setDataSource(dataSource);
-		return tx;
+	public static void main(String[] args) {
+		SpringApplication.run(WorkflowConfig.class, args);
 	}
 
 //	 <bean id="processEngineConfiguration" class="org.activiti.spring.SpringProcessEngineConfiguration">
