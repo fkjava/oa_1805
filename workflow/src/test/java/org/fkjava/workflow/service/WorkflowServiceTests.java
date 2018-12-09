@@ -9,14 +9,22 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+import org.activiti.engine.impl.identity.Authentication;
 import org.activiti.engine.repository.ProcessDefinition;
+import org.activiti.engine.task.Task;
 import org.fkjava.common.data.domain.Result;
+import org.fkjava.identity.UserHolder;
+import org.fkjava.identity.domain.Role;
+import org.fkjava.identity.domain.User;
 import org.fkjava.workflow.WorkflowConfig;
 import org.fkjava.workflow.vo.ProcessForm;
+import org.fkjava.workflow.vo.TaskForm;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -47,6 +55,7 @@ public class WorkflowServiceTests
 		try (ZipOutputStream out = new ZipOutputStream(outputStream);) {
 			this.addFile(out, name + ".bpmn");
 			this.addFile(out, name + ".png");
+			this.addFile(out, name + "-task1.html");
 		}
 
 		try (InputStream in = new ByteArrayInputStream(outputStream.toByteArray())) {
@@ -59,6 +68,26 @@ public class WorkflowServiceTests
 		if (definition != null) {
 			processDefinitionId = definition.getId();
 		}
+
+		// 模拟用户、用户的角色（用户组）
+		// 需要把identity模块加入进来
+		User user = new User();
+		user.setId("用户1");
+		user.setName("用户1");
+
+		Role role = new Role();
+		role.setId("用户组1");
+		role.setName("用户组1");
+
+		List<Role> roles = new LinkedList<>();
+		roles.add(role);
+		user.setRoles(roles);
+
+		UserHolder.set(user);
+
+		// 告诉流程引擎：当前用户的ID是什么！
+		// 这句话必须要放入拦截器里面
+		Authentication.setAuthenticatedUserId("初始测试用户");
 	}
 
 	private void addFile(ZipOutputStream out, String name) throws IOException, URISyntaxException {
@@ -126,5 +155,68 @@ public class WorkflowServiceTests
 		System.out.println("流程实例启动结束");
 		Assert.assertNotNull(result);
 		Assert.assertEquals(Result.CODE_OK, result.getCode());
+	}
+
+	// 查询待办信息
+	@Test
+	public void findTasks() {
+		start();// 启动一个流程实例用于测试待办任务
+
+		String keyword = null;
+		int pageNumber = 0;
+		Page<TaskForm> page = this.workflowService.findTasks(keyword, null, pageNumber);
+		Assert.assertNotNull(page);
+		Assert.assertTrue("必须要有数据", page.getTotalElements() > 0);
+	}
+
+	// 打开待办
+	@Test
+	public void findTask() {
+		start();// 启动一个流程实例用于测试待办任务
+
+		String keyword = null;
+		int pageNumber = 0;
+		Page<TaskForm> page = this.workflowService.findTasks(keyword, null, pageNumber);
+		Assert.assertNotNull(page);
+		Assert.assertTrue("必须要有数据", page.getTotalElements() > 0);
+
+		// 获取第一个任务的id，然后根据id查询待办任务的详情，包括：表单内容、表单属性、表单名称
+		String taskId = page.getContent().get(0).getTask().getId();
+		TaskForm taskForm = this.workflowService.getTaskForm(taskId);
+		Assert.assertNotNull(taskForm);
+		Assert.assertNotNull(taskForm.getContent());// 表单内容不能为空
+		Assert.assertNotNull(taskForm.getFormKey());// 表单名字不能为空
+		Assert.assertNotNull(taskForm.getFormData());// 表单属性也不能为空
+	}
+
+	@Test
+	public void testComplete() {
+		start();// 启动一个流程实例用于测试待办任务
+
+		String keyword = null;
+		int pageNumber = 0;
+		Page<TaskForm> page = this.workflowService.findTasks(keyword, null, pageNumber);
+		Assert.assertNotNull(page);
+		Assert.assertTrue("必须要有数据", page.getTotalElements() > 0);
+
+		String taskId = page.getContent().get(0).getTask().getId();
+		// 完成任务以后，根据流程实例的ID查询任务，检查新的任务是否为预期任务
+		String processInstanceId = page.getContent().get(0).getTask().getProcessInstanceId();
+
+		// 根据任务的ID完成任务。
+		// 用户在页面上填写哪些信息，对于开发者来讲是不可预测的。
+		// 所以为了让流程能够继续下一个步骤，必须要获取所有的请求参数。类似于启动流程实例的时候。
+		Map<String, String[]> params = new HashMap<>();
+		params.put("参数", new String[] { "b" });// 模拟页面传入的参数，用于【下一步】的判断
+
+		this.workflowService.complete(taskId, params);
+
+		// 测试以后，需要判断新的任务是否为【任务2】
+		UserHolder.remove();// 后面不是相同的用户的任务，所以清空当前用户
+		page = this.workflowService.findTasks(keyword, processInstanceId, pageNumber);
+		Assert.assertNotNull(page);
+		Assert.assertTrue("必须要有数据", page.getTotalElements() > 0);
+		Task task = page.getContent().get(0).getTask();
+		Assert.assertEquals("任务2", task.getName());
 	}
 }

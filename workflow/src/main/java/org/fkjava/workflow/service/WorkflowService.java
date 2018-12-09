@@ -6,6 +6,7 @@ import java.util.Map;
 import org.activiti.engine.repository.ProcessDefinition;
 import org.fkjava.common.data.domain.Result;
 import org.fkjava.workflow.vo.ProcessForm;
+import org.fkjava.workflow.vo.TaskForm;
 import org.springframework.data.domain.Page;
 
 public interface WorkflowService {
@@ -25,4 +26,15 @@ public interface WorkflowService {
 	ProcessForm findDefnitionByKey(String key);
 
 	Result start(String processDefinitionId, Map<String, String[]> params);
+
+	Page<TaskForm> findTasks(String keyword, String processInstanceId, int pageNumber);
+
+	TaskForm getTaskForm(String taskId);
+
+	/**
+	 * 
+	 * @param taskId 要完成的任务的ID
+	 * @param params 页面传到控制器的所有请求参数
+	 */
+	void complete(String taskId, Map<String, String[]> params);
 }
