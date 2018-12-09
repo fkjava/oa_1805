@@ -7,7 +7,6 @@ import javax.sql.DataSource;
 import org.activiti.engine.FormService;
 import org.activiti.engine.HistoryService;
 import org.activiti.engine.ProcessEngine;
-import org.activiti.engine.ProcessEngineConfiguration;
 import org.activiti.engine.RepositoryService;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
@@ -77,7 +76,7 @@ public class WorkflowConfig implements WebMvcConfigurer {
 		config.setDataSource(dataSource);
 		config.setTransactionManager(transactionManager);
 		// 自动更新数据库表，如果表不存在会自动创建
-		config.setDatabaseSchemaUpdate(ProcessEngineConfiguration.DB_SCHEMA_UPDATE_TRUE);
+		config.setDatabaseSchemaUpdate(SpringProcessEngineConfiguration.DB_SCHEMA_UPDATE_TRUE);
 		config.setJobExecutorActivate(false);// 是否激活定时任务
 
 		return config;
