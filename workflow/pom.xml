@@ -7,57 +7,30 @@
 		<artifactId>oa</artifactId>
 		<version>0.0.1-SNAPSHOT</version>
 	</parent>
-	<artifactId>show</artifactId>
-	<packaging>war</packaging>
-
+	<artifactId>workflow</artifactId>
 	<dependencies>
-		<!-- 加入用户、角色模块，并且把关联的其他依赖也加入 -->
 		<dependency>
 			<groupId>org.fkjava</groupId>
-			<artifactId>disk</artifactId>
+			<artifactId>security</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>org.fkjava</groupId>
-			<artifactId>call-borad</artifactId>
-			<version>${project.version}</version>
+			<groupId>org.springframework.data</groupId>
+			<artifactId>spring-data-commons</artifactId>
 		</dependency>
+		<!-- 流程引擎和Spring集成的包 -->
 		<dependency>
-			<groupId>org.fkjava</groupId>
-			<artifactId>human-resource</artifactId>
-			<version>${project.version}</version>
+			<groupId>org.activiti</groupId>
+			<artifactId>activiti-spring</artifactId>
+			<version>5.22.0</version>
 		</dependency>
+		<!-- 数据库驱动 -->
 		<dependency>
-			<groupId>org.fkjava</groupId>
-			<artifactId>home-work</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.fkjava</groupId>
-			<artifactId>sms-login</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.fkjava</groupId>
-			<artifactId>workflow</artifactId>
-			<version>${project.version}</version>
+			<groupId>mysql</groupId>
+			<artifactId>mysql-connector-java</artifactId>
+			<scope>runtime</scope>
 		</dependency>
 
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-web</artifactId>
-			<exclusions>
-				<exclusion>
-					<groupId>org.springframework.boot</groupId>
-					<artifactId>spring-boot-starter-tomcat</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-tomcat</artifactId>
-			<scope>provided</scope>
-		</dependency>
 		<!-- 加入Servlet API的依赖 -->
 		<dependency>
 			<groupId>javax.servlet</groupId>
@@ -83,9 +56,17 @@
 			<!-- 可选的，必须设置为true，才能实现热部署 -->
 			<optional>true</optional>
 		</dependency>
-	</dependencies>
 
-	<build>
-		<finalName>${project.artifactId}</finalName>
-	</build>
+		<!-- 测试的软件包 -->
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
 </project>
