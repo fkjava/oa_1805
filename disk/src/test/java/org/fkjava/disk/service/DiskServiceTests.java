@@ -24,6 +24,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.junit4.AbstractTransactionalJUnit4SpringContextTests;
 import org.springframework.test.context.junit4.SpringRunner;
 
@@ -48,14 +50,23 @@ public class DiskServiceTests//
 
 		UserHolder.set(user);
 
-		this.initFile("logo_2.png");
-		this.initFile("logo.png");
+		this.initFile(null, "logo_2.png");
+		this.initFile(null, "logo.png");
 
 		this.diskService.mkdir(null, "目录1");
 		this.diskService.mkdir(null, "目录2");
+
+		// 查询目录，上传文件到对应的目录中
+		Pageable pageable = PageRequest.of(0, 10);
+		Page<FileItem> dirs = this.fileItemRepository.findByUserAndType(user, ItemType.DIR, pageable);
+		for (FileItem dir : dirs.getContent()) {
+			String dirId = dir.getId();
+			this.initFile(dirId, "logo.png");
+			this.initFile(dirId, "logo_2.png");
+		}
 	}
 
-	private void initFile(String name) throws IOException, URISyntaxException {
+	private void initFile(String dirId, String name) throws IOException, URISyntaxException {
 		log.trace("创建测试文件: {}", name);
 		URL url = this.getClass().getResource("/images/" + name);
 		String fingerprint;
@@ -71,7 +82,13 @@ public class DiskServiceTests//
 			fileInfo.setName(file.getName());
 
 			FileItem item = new FileItem();
-			item.setParent(null);
+			if (dirId != null) {
+				FileItem parent = new FileItem();
+				parent.setId(dirId);
+				item.setParent(parent);
+			} else {
+				item.setParent(null);
+			}
 			item.setFileInfo(fileInfo);
 			item.setType(ItemType.FILE);
 
@@ -190,7 +207,7 @@ public class DiskServiceTests//
 	 */
 	@Test
 	public void uploadExistsFile() throws IOException, URISyntaxException {
-		initFile("logo.png");
+		initFile(null, "logo.png");
 	}
 
 	/**
@@ -229,5 +246,20 @@ public class DiskServiceTests//
 	 */
 	@Test
 	public void findFiles() {
+		Pageable pageable = PageRequest.of(0, 10);
+		Page<FileItem> dirs = this.fileItemRepository.findByUserAndType(UserHolder.get(), ItemType.DIR, pageable);
+		FileItem dir = dirs.getContent().get(0);
+		String dirId = dir.getId();
+		Page<FileItem> items = this.diskService.findFiles(dirId, null, "fileInfo.name", "desc", 0);
+		Assert.assertNotNull("必须要返回查询结果", items);
+		Assert.assertTrue("查询的记录数必须大于0", items.getNumberOfElements() > 0);
+
+		items = this.diskService.findFiles(dirId, "logo", "fileInfo.name", "desc", 0);
+		Assert.assertNotNull("必须要返回查询结果", items);
+		Assert.assertTrue("查询的记录数必须大于0", items.getNumberOfElements() > 0);
+
+		items = this.diskService.findFiles(null, null, "fileInfo.name", "desc", 0);
+		Assert.assertNotNull("必须要返回查询结果", items);
+		Assert.assertTrue("查询的记录数必须大于0", items.getNumberOfElements() > 0);
 	}
 }

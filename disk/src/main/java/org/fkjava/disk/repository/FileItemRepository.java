@@ -6,12 +6,13 @@ import org.fkjava.identity.domain.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface FileItemRepository extends JpaRepository<FileItem, String> {
+public interface FileItemRepository extends JpaRepository<FileItem, String>, JpaSpecificationExecutor<FileItem> {
 
 	@Query("from FileItem item where item.user=:user and item.type=:type and item.fileInfo.name like :keyword")
 	Page<FileItem> findByTypeAndNameLike(//

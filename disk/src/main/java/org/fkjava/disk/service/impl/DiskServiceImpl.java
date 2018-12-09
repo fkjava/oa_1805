@@ -2,6 +2,14 @@ package org.fkjava.disk.service.impl;
 
 import java.io.InputStream;
 import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
+
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Join;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
 
 import org.fkjava.common.data.domain.Result;
 import org.fkjava.disk.domain.FileItem;
@@ -24,6 +32,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Order;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -153,9 +162,66 @@ public class DiskServiceImpl implements DiskService {
 	}
 
 	@Override
-	public Page<FileItem> findFiles(String dirId, String keyword, String orderByProperty, String orderByDescription,
+	public Page<FileItem> findFiles(String dirId, String qt, String orderByProperty, String orderByDescription,
 			Integer pageNumber) {
-		return null;
+		// 如果有目录，则要根据目录来查询
+		FileItem parentItem = null;
+		if (!StringUtils.isEmpty(dirId)) {
+			parentItem = this.fileItemRepository.findById(dirId).orElse(null);
+		}
+		if (parentItem != null) {
+			if (parentItem.getType() == ItemType.FILE) {
+				parentItem = parentItem.getParent();
+			}
+		}
+		FileItem parent = parentItem;
+		// 查询参数判断
+		String keyword;
+		if (StringUtils.isEmpty(qt)) {
+			keyword = null;
+		} else {
+			keyword = "%" + qt + "%";
+		}
+
+		// 排序条件
+		Sort sort = Sort.unsorted();
+		if (!StringUtils.isEmpty(orderByProperty)) {
+			if ("desc".equalsIgnoreCase(orderByDescription)) {
+				sort = Sort.by(Order.desc(orderByProperty));
+			} else {
+				sort = Sort.by(Order.asc(orderByProperty));
+			}
+		}
+
+		// 分页条件
+		Pageable pageable = PageRequest.of(pageNumber, 10, sort);
+
+		// 查询条件
+		Specification<FileItem> spec = (Root<FileItem> root, //
+				CriteriaQuery<?> query, //
+				CriteriaBuilder criteriaBuilder//
+		) -> {
+			// 如果有传入目录，则根据目录来查询
+			List<Predicate> predicates = new LinkedList<>();
+			if (parent != null) {
+				Predicate parentPredicate = criteriaBuilder.equal(root.get("parent"), parent);
+				predicates.add(parentPredicate);
+			} else {
+				Predicate parentPredicate = criteriaBuilder.isNull(root.get("parent"));
+				predicates.add(parentPredicate);
+			}
+			// 关键词查询，关联文件信息的名称来查询
+			if (keyword != null) {
+				Join<FileItem, FileInfo> join = root.join("fileInfo");
+				Predicate keywordPredicate = criteriaBuilder.like(join.get("name"), keyword);
+				predicates.add(keywordPredicate);
+			}
+			return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
+		};
+
+		Page<FileItem> page = this.fileItemRepository.findAll(spec, pageable);
+
+		return page;
 	}
 
 }

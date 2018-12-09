@@ -43,6 +43,15 @@ public interface DiskService {
 	 */
 	FileItem upload(FileItem item);
 
+	/**
+	 * 
+	 * @param dirId              上级目录的ID，如果没有指定目录，则查询根目录的数据
+	 * @param keyword            根据关键词查询，但是仅限于查询文件名
+	 * @param orderByProperty    排序属性，如果要使用文件名查询则需要传入fileInfo.name，如果要使用文件大小则传入fileInfo.fileSize
+	 * @param orderByDescription 排序的顺序，可选的为DESC、ASC
+	 * @param pageNumber         页码，第一页为0
+	 * @return
+	 */
 	Page<FileItem> findFiles(String dirId, String keyword, String orderByProperty, String orderByDescription,
 			Integer pageNumber);
 
