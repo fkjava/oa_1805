@@ -1,8 +1,8 @@
 package org.fkjava.disk.controller;
 
 import org.fkjava.common.data.domain.Result;
+import org.fkjava.disk.service.DiskService;
 import org.fkjava.identity.domain.User;
-import org.fkjava.identity.service.IdentityService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,7 +16,7 @@ import org.springframework.web.servlet.ModelAndView;
 public class RegisterController {
 
 	@Autowired
-	private IdentityService identityService;
+	private DiskService diskService;
 
 	@GetMapping
 	public String reg() {
@@ -35,7 +35,7 @@ public class RegisterController {
 	public Result reg(User user) {
 
 		Result result = Result.ok("注册成功，请登录后使用");
-		this.identityService.save(user);
+		this.diskService.register(user);
 		return result;
 	}
 }

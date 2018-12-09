@@ -14,4 +14,6 @@ public interface FileInfoRepository extends JpaRepository<FileInfo, String> {
 
 	Page<FileInfo> findByOwnerAndNameContaining(User user, String keyword, Pageable pageable);
 
+	FileInfo findByFingerprint(String fingerprint);
+
 }

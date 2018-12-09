@@ -51,7 +51,7 @@ public class StorageServiceImpl implements StorageService {
 	}
 
 	@Override
-	public void save(FileInfo info, InputStream in) {
+	public FileInfo save(FileInfo info, InputStream in) {
 		// 保存文件
 		String path = UUID.randomUUID().toString();
 		File file = new File(dir, path);
@@ -88,6 +88,7 @@ public class StorageServiceImpl implements StorageService {
 		FileInfo fi = this.fileInfoRepository.save(info);
 		// 为了把id返回给控制器使用
 		info.setId(fi.getId());
+		return fi;
 	}
 
 	@Override
@@ -138,5 +139,10 @@ public class StorageServiceImpl implements StorageService {
 			this.fileInfoRepository.delete(info);
 		}
 		return null;
+	}
+
+	@Override
+	public FileInfo findByFingerprint(String fingerprint) {
+		return this.fileInfoRepository.findByFingerprint(fingerprint);
 	}
 }

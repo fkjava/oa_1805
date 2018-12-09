@@ -9,7 +9,7 @@ import org.springframework.data.domain.Page;
 
 public interface StorageService {
 
-	void save(FileInfo info, InputStream in);
+	FileInfo save(FileInfo info, InputStream in);
 
 	Page<FileInfo> findFiles(String keyword, Integer number);
 
@@ -19,4 +19,5 @@ public interface StorageService {
 
 	Result deleteFile(String id);
 
+	FileInfo findByFingerprint(String fingerprint);
 }
