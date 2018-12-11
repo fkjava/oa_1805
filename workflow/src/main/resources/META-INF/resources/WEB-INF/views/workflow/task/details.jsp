@@ -9,7 +9,7 @@
 <meta charset="UTF-8">
 <title>处理任务</title>
 <link rel="stylesheet" href="<c:url value='/css/workflow.css'/>"/>
-<link rel="stylesheet" href="<c:url value='/webjars/Eonasdan-bootstrap-datetimepicker/4.17.43/css/bootstrap-datetimepicker.min.css'/>"/>
+<link rel="stylesheet" href="${ctx }/static/datetimepicker/css/bootstrap-datetimepicker.min.css"/>
 </head>
 <body>
 <div class="container-fluid">
@@ -18,7 +18,8 @@
 	</c:if>
 	<form action="./${form.task.id }" 
 		method="post" 
-		enctype="multipart/form-data">
+		enctype="multipart/form-data"
+		onsubmit="return checkFormOnSubmit();">
 		<div class="panel panel-default">
 			<!-- Default panel contents -->
 			<div class="panel-heading">
@@ -60,8 +61,9 @@
 			value="${_csrf.token}"/>
 	</form>
 </div>
-<script type="text/javascript" src="<c:url value='/webjars/momentjs/2.10.3/min/moment-with-locales.min.js'/>"></script>
-<script type="text/javascript" src="<c:url value='/webjars/Eonasdan-bootstrap-datetimepicker/4.17.43/js/bootstrap-datetimepicker.min.js'/>"></script>
+<script type="text/javascript" src="<c:url value='/static/datetimepicker/js/bootstrap-datetimepicker.min.js'/>"></script>
+<script type="text/javascript" src="<c:url value='/static/datetimepicker/js/locales/bootstrap-datetimepicker.zh-CN.js'/>"></script>
+
 <script type="text/javascript" src="<c:url value='/js/workflow.js'/>"></script>
 </body>
 </html>

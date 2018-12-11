@@ -21,7 +21,8 @@
 	</c:if>
 	<form action="./${form.definition.id }?processDefinitionKey=${form.definition.key }" 
 		method="post" 
-		enctype="multipart/form-data">
+		enctype="multipart/form-data"
+		onsubmit="return checkFormOnSubmit();">
 		<div class="panel panel-default">
 			<!-- Default panel contents -->
 			<div class="panel-heading">
