@@ -388,11 +388,53 @@ public class WorkflowServiceImpl implements WorkflowService, ApplicationContextA
 		// 表单名称
 		String formKey = this.formService.getTaskFormKey(tf.getDefinition().getId(), task.getTaskDefinitionKey());
 
+		// 判断是否有业务数据的主键，如果有则去查询业务数据
+		BusinessData data = getBusinessData(tf.getDefinition(), tf.getInstance().getBusinessKey());
+
+		tf.setData(data);
+
 		tf.setContent(content);
 		tf.setFormData(formData);
 		tf.setFormKey(formKey);
 
 		return tf;
+	}
+
+	@SuppressWarnings("unchecked")
+	private BusinessData getBusinessData(ProcessDefinition definition, String businessKey) {
+		if (StringUtils.isEmpty(businessKey)) {
+			return null;
+		}
+
+		StartFormData formData = this.formService.getStartFormData(definition.getId());
+		String serviceClassName = null;
+		for (FormProperty p : formData.getFormProperties()) {
+			if (p.getId().equals("serviceClass")) {
+				serviceClassName = p.getValue();
+			}
+		}
+		if (StringUtils.isEmpty(serviceClassName)) {
+			log.trace("业务数据类为空，不能查询业务数据");
+			return null;
+		}
+		// 根据类名得到Class对象
+		Class<BusinessDataService<BusinessData>> serviceClass;
+		try {
+			serviceClass = (Class<BusinessDataService<BusinessData>>) Class.forName(serviceClassName);
+		} catch (Exception e) {
+			log.trace("无法加载业务实体类或者业务数据类: " + e.getLocalizedMessage(), e);
+			return null;
+		}
+
+		BusinessDataService<BusinessData> service;
+		try {
+			service = this.applicationContext.getBean(serviceClass);
+		} catch (Exception e) {
+			log.trace("无法找到类型为 " + serviceClassName + " 的Bean: " + e.getLocalizedMessage(), e);
+			return null;
+		}
+		BusinessData old = service.get(businessKey);
+		return old;
 	}
 
 	@Override

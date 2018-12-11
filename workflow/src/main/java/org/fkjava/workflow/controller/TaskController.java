@@ -3,6 +3,7 @@ package org.fkjava.workflow.controller;
 import java.util.Map;
 
 import org.fkjava.common.data.domain.Result;
+import org.fkjava.workflow.domain.BusinessData;
 import org.fkjava.workflow.service.WorkflowService;
 import org.fkjava.workflow.vo.TaskForm;
 import org.slf4j.Logger;
@@ -18,6 +19,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 @Controller
 @RequestMapping("/workflow/task")
 public class TaskController {
@@ -25,6 +29,8 @@ public class TaskController {
 	private Logger log = LoggerFactory.getLogger(TaskController.class);
 	@Autowired
 	private WorkflowService workflowService;
+	@Autowired // Spring Boot已经有objectMapper
+	private ObjectMapper objectMapper;
 
 	@GetMapping
 	public ModelAndView index(//
@@ -44,6 +50,18 @@ public class TaskController {
 		ModelAndView mav = new ModelAndView("workflow/task/details");
 		TaskForm form = this.workflowService.getTaskForm(taskId);
 		mav.addObject("form", form);
+
+		// 把业务数据转换为JSON，然后返回给JSP
+		BusinessData data = form.getData();
+		String json;
+		try {
+			json = objectMapper.writeValueAsString(data);
+		} catch (JsonProcessingException e) {
+			log.trace("无法把业务数据转换为JSON：" + e.getLocalizedMessage(), e);
+			// 出现异常，直接返回一个空的JSON对象，避免JS语法报错
+			json = "{}";
+		}
+		mav.addObject("json", json);
 
 		return mav;
 	}

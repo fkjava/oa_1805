@@ -13,6 +13,8 @@ import javax.persistence.TemporalType;
 import org.fkjava.identity.domain.User;
 import org.hibernate.annotations.GenericGenerator;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 @MappedSuperclass
 public abstract class AbstractBusinessData implements BusinessData {
 
@@ -22,6 +24,7 @@ public abstract class AbstractBusinessData implements BusinessData {
 	private String id;
 	@ManyToOne()
 	@JoinColumn(name = "user_id")
+	@JsonIgnore
 	private User user;
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date submitTime;

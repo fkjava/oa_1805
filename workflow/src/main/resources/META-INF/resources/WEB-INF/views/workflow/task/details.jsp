@@ -12,6 +12,9 @@
 <link rel="stylesheet" href="${ctx }/static/datetimepicker/css/bootstrap-datetimepicker.min.css"/>
 </head>
 <body>
+<script type="text/javascript">
+var businessData = ${json};
+</script>
 <div class="container-fluid">
 	<c:if test="${not empty result }">
 		<div class="alert alert-danger" role="alert">${result.message }</div>
