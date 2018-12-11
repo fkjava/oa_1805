@@ -6,6 +6,7 @@ import java.util.Map;
 import org.activiti.engine.repository.ProcessDefinition;
 import org.fkjava.common.data.domain.Result;
 import org.fkjava.workflow.vo.ProcessForm;
+import org.fkjava.workflow.vo.ProcessImage;
 import org.fkjava.workflow.vo.TaskForm;
 import org.springframework.data.domain.Page;
 
@@ -37,4 +38,8 @@ public interface WorkflowService {
 	 * @param params 页面传到控制器的所有请求参数
 	 */
 	void complete(String taskId, Map<String, String[]> params);
+
+	Page<ProcessForm> findInstances(String keyword, int pageNumber);
+
+	ProcessImage getTraceImage(String id);
 }

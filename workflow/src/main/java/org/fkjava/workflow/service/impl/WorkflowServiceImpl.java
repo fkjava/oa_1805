@@ -1,5 +1,11 @@
 package org.fkjava.workflow.service.impl;
 
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Graphics2D;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
@@ -10,6 +16,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.zip.ZipInputStream;
 
+import javax.imageio.ImageIO;
+
+import org.activiti.bpmn.model.BpmnModel;
+import org.activiti.bpmn.model.GraphicInfo;
 import org.activiti.engine.FormService;
 import org.activiti.engine.HistoryService;
 import org.activiti.engine.RepositoryService;
@@ -19,6 +29,7 @@ import org.activiti.engine.form.FormData;
 import org.activiti.engine.form.FormProperty;
 import org.activiti.engine.form.StartFormData;
 import org.activiti.engine.history.HistoricProcessInstance;
+import org.activiti.engine.history.HistoricProcessInstanceQuery;
 import org.activiti.engine.repository.DeploymentBuilder;
 import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.engine.repository.ProcessDefinitionQuery;
@@ -34,6 +45,7 @@ import org.fkjava.workflow.domain.BusinessData;
 import org.fkjava.workflow.service.BusinessDataService;
 import org.fkjava.workflow.service.WorkflowService;
 import org.fkjava.workflow.vo.ProcessForm;
+import org.fkjava.workflow.vo.ProcessImage;
 import org.fkjava.workflow.vo.TaskForm;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -478,5 +490,112 @@ public class WorkflowServiceImpl implements WorkflowService, ApplicationContextA
 		this.taskService.complete(taskId, variables);
 		// 9.保存流程跟踪信息
 		this.saveProcessTrace(definition, instance, task, remark);
+	}
+
+	@Override
+	public Page<ProcessForm> findInstances(String keyword, int pageNumber) {
+		HistoricProcessInstanceQuery query = this.historyService.createHistoricProcessInstanceQuery();
+		// 查询当前用户创建的流程实例。
+		// 必须要在拦截器里面，告诉流程引擎当前用户是谁！
+		query.startedBy(UserHolder.get().getId());
+		// 倒序排列
+		query.orderByProcessInstanceStartTime().desc();
+
+		// 总数
+		long total = query.count();
+
+		// 分页查询记录
+		Pageable pageable = PageRequest.of(pageNumber, 10);
+		List<HistoricProcessInstance> instances = query//
+				.listPage((int) pageable.getOffset(), pageable.getPageSize());
+
+		List<ProcessForm> content = new LinkedList<>();
+		// 查询关联数据
+		for (HistoricProcessInstance instance : instances) {
+			ProcessForm f = new ProcessForm();
+			f.setInstance(instance);
+
+//			String startUserId = instance.getStartUserId();
+//			if (StringUtils.isEmpty(startUserId)) {
+//				User initialUser = this.identityService.findUserById(startUserId);
+//				f.setInitialUser(initialUser);
+//			}
+
+			ProcessDefinition definition = this.findDefnitionById(instance.getProcessDefinitionId());
+			f.setDefinition(definition);
+
+			content.add(f);
+		}
+
+		Page<ProcessForm> page = new PageImpl<>(content, pageable, total);
+
+		return page;
+	}
+
+	@Override
+	public ProcessImage getTraceImage(String id) {
+		// 1.根据流程实例的ID查询流程定义，根据流程定义获取静态的图片
+		HistoricProcessInstance instance = this.historyService.createHistoricProcessInstanceQuery()//
+				.processInstanceId(id)//
+				.singleResult();
+		ProcessDefinition definition = this.findDefnitionById(instance.getProcessDefinitionId());
+
+		ProcessImage image = this.getStaticImage(definition.getId());
+		image.setName(definition.getDiagramResourceName());
+		if (instance.getEndTime() != null) {
+			// 表示流程已经结束
+			return image;
+		}
+		try {
+			ByteArrayInputStream input = new ByteArrayInputStream(image.getContent());
+			// 2.把图片读取到内存中，生成一个BufferedImage对象
+			BufferedImage img = ImageIO.read(input);
+			Graphics2D g2d = img.createGraphics();
+			g2d.setColor(Color.RED);// 线的颜色
+			g2d.setStroke(new BasicStroke(2.0f));// 线宽
+
+			// 3.获取BpmnModel，查询图形信息和当前的活动环节
+			BpmnModel bpmnModel = this.repositoryService.getBpmnModel(definition.getId());// BPMN模型
+			List<String> ids = this.runtimeService.getActiveActivityIds(instance.getId());// 所有当前活动的ID
+
+			for (String i : ids) {
+				// GraphicInfo里面包含了坐标、大小
+				GraphicInfo gi = bpmnModel.getGraphicInfo(i);
+
+				// 按照图形信息，画一个圆角矩形
+				g2d.drawRoundRect(//
+						(int) gi.getX(), //
+						(int) gi.getY(), //
+						(int) gi.getWidth(), //
+						(int) gi.getHeight(), //
+						20, 20);
+			}
+			// 把图片转换为字节流
+			ByteArrayOutputStream output = new ByteArrayOutputStream();
+			ImageIO.write(img, "png", output);
+
+			image.setContent(output.toByteArray());
+		} catch (IOException e) {
+			log.trace("绘制实时跟踪流程图出现问题: " + e.getLocalizedMessage(), e);
+		}
+		return image;
+	}
+
+	private ProcessImage getStaticImage(String id) {
+		ProcessImage img = new ProcessImage();
+		// 获取静态流程图
+		try (InputStream in = this.repositoryService.getProcessDiagram(id);) {
+			byte[] b = new byte[1024];
+
+			ByteArrayOutputStream out = new ByteArrayOutputStream();
+
+			for (int len = in.read(b); len != -1; len = in.read(b)) {
+				out.write(b, 0, len);
+			}
+			img.setContent(out.toByteArray());
+		} catch (IOException e) {
+			log.trace("获取静态流程图出现问题: " + e.getLocalizedMessage(), e);
+		}
+		return img;
 	}
 }
