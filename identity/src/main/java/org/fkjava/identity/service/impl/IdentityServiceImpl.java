@@ -23,7 +23,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
-@Service
+@Service(value = "identityService")
 public class IdentityServiceImpl implements IdentityService {
 
 	@Autowired
