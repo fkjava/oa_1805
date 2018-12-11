@@ -68,5 +68,12 @@
 			<artifactId>junit</artifactId>
 			<scope>test</scope>
 		</dependency>
+
+		<!-- 日期时间选择控件 -->
+<!-- 		<dependency> -->
+<!-- 			<groupId>org.webjars</groupId> -->
+<!-- 			<artifactId>Eonasdan-bootstrap-datetimepicker</artifactId> -->
+<!-- 			<version>4.17.43</version> -->
+<!-- 		</dependency> -->
 	</dependencies>
 </project>

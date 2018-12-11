@@ -1,0 +1,7 @@
+.data-list tbody tr:hover {
+	background-color: #cccccc;
+}
+
+.data-list th, .data-list td {
+	text-align: center;
+}

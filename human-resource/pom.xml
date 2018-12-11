@@ -13,7 +13,7 @@
 	<dependencies>
 		<dependency>
 			<groupId>org.fkjava</groupId>
-			<artifactId>security</artifactId>
+			<artifactId>workflow</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 

@@ -8,6 +8,8 @@
 <head>
 <meta charset="UTF-8">
 <title>启动流程</title>
+<link rel="stylesheet" href="<c:url value='/css/workflow.css'/>"/>
+<link rel="stylesheet" href="${ctx }/static/datetimepicker/css/bootstrap-datetimepicker.min.css"/>
 </head>
 <body>
 <div class="container-fluid">
@@ -53,5 +55,9 @@
 			value="${_csrf.token}"/>
 	</form>
 </div>
+<script type="text/javascript" src="<c:url value='/static/datetimepicker/js/bootstrap-datetimepicker.min.js'/>"></script>
+<script type="text/javascript" src="<c:url value='/static/datetimepicker/js/locales/bootstrap-datetimepicker.zh-CN.js'/>"></script>
+
+<script type="text/javascript" src="<c:url value='/js/workflow.js'/>"></script>
 </body>
 </html>

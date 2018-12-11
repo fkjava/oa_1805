@@ -12,8 +12,7 @@
     <link rel="icon" href="${ctx }/images/favicon.ico">
     <title>麻花藤智能办公自动化--<sitemesh:write property="title"/></title>
     <!-- Bootstrap core CSS -->
-    <link rel="stylesheet" href="${ctx }/webjars/bootstrap/3.3.7/dist/css/bootstrap.min.css"/>
-    <!-- Custom styles for this template -->
+    <link rel="stylesheet" href="${ctx }/webjars/bootstrap/3.3.7/dist/css/bootstrap.css"/>
     <link href="${ctx }/css/layout.css" rel="stylesheet"/>
     <link rel="stylesheet" href="${ctx }/static/css/fkjava.css"/>
     
