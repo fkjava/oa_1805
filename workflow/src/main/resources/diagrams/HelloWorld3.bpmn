@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="测试">
+  <process id="HelloWorld3" name="您好3" isExecutable="true">
+    <documentation>我是说明我是说明我是说明我是说明我是说明我是说明我是说明我是说明我是说明我是说明我是说明我是说明我是说明我是说明我是说明我是说明我是说明我是说明我是说明我是说明我是说明我是说明我是说明我是说明我是说明我是说明&lt;br/&gt;
+我是说明我是说明我是说明我是说明</documentation>
+    <startEvent id="startHello" name="开启HelloWorld" activiti:formKey="HelloWorld3-start.html">
+      <extensionElements>
+        <activiti:formProperty id="entityClass" type="string" default="org.fkjava.hello.domain.HelloWorld"></activiti:formProperty>
+        <activiti:formProperty id="serviceClass" name="业务逻辑层实现类的名称" default="org.fkjava.hello.service.HelloWorldService"></activiti:formProperty>
+      </extensionElements>
+    </startEvent>
+    <userTask id="usertask1" name="世界" activiti:assignee="${  identityService.findByLoginName('guanyu').orElse(null).getId()   }" activiti:formKey="HelloWorld3-task1.html">
+      <extensionElements>
+        <activiti:formProperty id="operation" name="操作选项" type="enum">
+          <activiti:value id="走任务2" name="task2"></activiti:value>
+          <activiti:value id="走任务1" name="随便写"></activiti:value>
+        </activiti:formProperty>
+      </extensionElements>
+    </userTask>
+    <sequenceFlow id="flow1" sourceRef="startHello" targetRef="usertask1"></sequenceFlow>
+    <exclusiveGateway id="exclusivegateway1" name="Exclusive Gateway" default="flow3"></exclusiveGateway>
+    <sequenceFlow id="flow2" sourceRef="usertask1" targetRef="exclusivegateway1"></sequenceFlow>
+    <userTask id="usertask2" name="任务1" activiti:assignee="${  identityService.findByLoginName('guanyu').orElse(null).getId()   }" activiti:candidateUsers="用户2,用户3" activiti:formKey="HelloWorld3-task2.html"></userTask>
+    <sequenceFlow id="flow3" sourceRef="exclusivegateway1" targetRef="usertask2"></sequenceFlow>
+    <userTask id="usertask3" name="任务2" activiti:assignee="${  identityService.findByLoginName('guanyu').orElse(null).getId()   }" activiti:candidateGroups="用户组1,用户组2" activiti:formKey="HelloWorld3-task3.html"></userTask>
+    <sequenceFlow id="flow4" name="操作选项选择【走任务2】的时候" sourceRef="exclusivegateway1" targetRef="usertask3">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${  operation eq 'task2'   }]]></conditionExpression>
+    </sequenceFlow>
+    <endEvent id="endevent1" name="End"></endEvent>
+    <sequenceFlow id="flow5" sourceRef="usertask2" targetRef="endevent1"></sequenceFlow>
+    <endEvent id="endevent2" name="End"></endEvent>
+    <sequenceFlow id="flow6" sourceRef="usertask3" targetRef="endevent2"></sequenceFlow>
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_HelloWorld3">
+    <bpmndi:BPMNPlane bpmnElement="HelloWorld3" id="BPMNPlane_HelloWorld3">
+      <bpmndi:BPMNShape bpmnElement="startHello" id="BPMNShape_startHello">
+        <omgdc:Bounds height="35.0" width="35.0" x="330.0" y="40.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="usertask1" id="BPMNShape_usertask1">
+        <omgdc:Bounds height="55.0" width="105.0" x="295.0" y="130.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="exclusivegateway1" id="BPMNShape_exclusivegateway1">
+        <omgdc:Bounds height="40.0" width="40.0" x="490.0" y="137.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="usertask2" id="BPMNShape_usertask2">
+        <omgdc:Bounds height="55.0" width="105.0" x="660.0" y="130.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="usertask3" id="BPMNShape_usertask3">
+        <omgdc:Bounds height="55.0" width="105.0" x="458.0" y="270.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="endevent1" id="BPMNShape_endevent1">
+        <omgdc:Bounds height="35.0" width="35.0" x="810.0" y="140.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="endevent2" id="BPMNShape_endevent2">
+        <omgdc:Bounds height="35.0" width="35.0" x="608.0" y="280.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="flow1" id="BPMNEdge_flow1">
+        <omgdi:waypoint x="347.0" y="75.0"></omgdi:waypoint>
+        <omgdi:waypoint x="347.0" y="130.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow2" id="BPMNEdge_flow2">
+        <omgdi:waypoint x="400.0" y="157.0"></omgdi:waypoint>
+        <omgdi:waypoint x="490.0" y="157.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow3" id="BPMNEdge_flow3">
+        <omgdi:waypoint x="530.0" y="157.0"></omgdi:waypoint>
+        <omgdi:waypoint x="660.0" y="157.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow4" id="BPMNEdge_flow4">
+        <omgdi:waypoint x="510.0" y="177.0"></omgdi:waypoint>
+        <omgdi:waypoint x="510.0" y="270.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="51.0" width="100.0" x="515.0" y="209.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow5" id="BPMNEdge_flow5">
+        <omgdi:waypoint x="765.0" y="157.0"></omgdi:waypoint>
+        <omgdi:waypoint x="810.0" y="157.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow6" id="BPMNEdge_flow6">
+        <omgdi:waypoint x="563.0" y="297.0"></omgdi:waypoint>
+        <omgdi:waypoint x="608.0" y="297.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>
