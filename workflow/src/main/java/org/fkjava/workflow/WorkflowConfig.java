@@ -19,6 +19,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.web.servlet.HandlerInterceptor;
@@ -27,6 +28,9 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @SpringBootApplication
 @ComponentScan("org.fkjava")
+@EnableJpaRepositories
+//@EnableJpaRepositories(basePackages = { "org.fkjava" })
+//@EntityScan(basePackages = "org.fkjava")
 public class WorkflowConfig implements WebMvcConfigurer {
 
 	public static void main(String[] args) {

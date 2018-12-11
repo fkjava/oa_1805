@@ -2,6 +2,8 @@ package org.fkjava.workflow.service.impl;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.InvocationTargetException;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -14,6 +16,8 @@ import org.activiti.engine.RepositoryService;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
 import org.activiti.engine.form.FormData;
+import org.activiti.engine.form.FormProperty;
+import org.activiti.engine.form.StartFormData;
 import org.activiti.engine.history.HistoricProcessInstance;
 import org.activiti.engine.repository.DeploymentBuilder;
 import org.activiti.engine.repository.ProcessDefinition;
@@ -21,25 +25,33 @@ import org.activiti.engine.repository.ProcessDefinitionQuery;
 import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.engine.task.Task;
 import org.activiti.engine.task.TaskQuery;
+import org.fkjava.common.data.converters.DateTimePropertyEditor;
 import org.fkjava.common.data.domain.Result;
 import org.fkjava.identity.UserHolder;
 import org.fkjava.identity.domain.User;
 import org.fkjava.identity.service.IdentityService;
+import org.fkjava.workflow.domain.BusinessData;
+import org.fkjava.workflow.service.BusinessDataService;
 import org.fkjava.workflow.service.WorkflowService;
 import org.fkjava.workflow.vo.ProcessForm;
 import org.fkjava.workflow.vo.TaskForm;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeansException;
+import org.springframework.beans.MutablePropertyValues;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
+import org.springframework.web.bind.WebDataBinder;
 
 @Service
-public class WorkflowServiceImpl implements WorkflowService {
+public class WorkflowServiceImpl implements WorkflowService, ApplicationContextAware {
 
 	private Logger log = LoggerFactory.getLogger(WorkflowServiceImpl.class);
 
@@ -58,6 +70,13 @@ public class WorkflowServiceImpl implements WorkflowService {
 	// 我们自己系统里面的用户权限服务，不使用流程引擎的
 	@Autowired
 	private IdentityService identityService;
+
+	private ApplicationContext applicationContext;
+
+	@Override
+	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+		this.applicationContext = applicationContext;
+	}
 
 	@Override
 	public Result deploy(String name, InputStream in) {
@@ -201,9 +220,95 @@ public class WorkflowServiceImpl implements WorkflowService {
 		return Result.ok("流程实例启动成功");
 	}
 
+	@SuppressWarnings("unchecked")
 	private String saveBusinessData(ProcessDefinition definition, Map<String, Object> variables) {
-		// TODO 暂时不保存业务数据
-		return null;
+		// 1.根据流程定义，找到流程的启动事件的表单属性
+		StartFormData formData = this.formService.getStartFormData(definition.getId());
+		// 2.在表单属性里面，如果有配置entityClass和serviceClass，就需要保存业务数据
+		String entityClassName = null;
+		String serviceClassName = null;
+		for (FormProperty p : formData.getFormProperties()) {
+			// 开始事件中，如果要配置业务数据相关的类名，并且要能够被当前代码处理。
+			// 那么entityClass和serviceClass两个属性绝对不能少，而且id必须相同！
+			if (p.getId().equals("entityClass")) {
+				entityClassName = p.getValue();
+			} else if (p.getId().equals("serviceClass")) {
+				serviceClassName = p.getValue();
+			}
+		}
+		if (StringUtils.isEmpty(entityClassName) || StringUtils.isEmpty(serviceClassName)) {
+			log.trace("业务实体类或者业务数据类为空，不能保存业务数据");
+			return null;
+		}
+		// 根据类名得到Class对象
+		Class<BusinessData> entityClass;
+		Class<BusinessDataService<BusinessData>> serviceClass;
+		try {
+			entityClass = (Class<BusinessData>) Class.forName(entityClassName);
+			serviceClass = (Class<BusinessDataService<BusinessData>>) Class.forName(serviceClassName);
+		} catch (Exception e) {
+			log.trace("无法加载业务实体类或者业务数据类: " + e.getLocalizedMessage(), e);
+			return null;
+		}
+
+		// 3.需要请求参数，转换为entityClass对应的实例，并且把参数值设置进去
+		BusinessData entity;
+		try {
+			// 业务实体类，必须包含无参构造器
+			entity = entityClass.getConstructor().newInstance();
+		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException
+				| NoSuchMethodException | SecurityException e) {
+			log.trace("无法创建业务实体的对象: " + e.getLocalizedMessage(), e);
+			return null;
+		}
+		try {
+			// 由于此时没有设置前缀，所以请求参数不要有前缀
+			WebDataBinder binder = getWebDataBinder(entity);
+			MutablePropertyValues pvs = new MutablePropertyValues(variables);
+			binder.bind(pvs);// 实现请求参数和实体的绑定
+		} catch (Exception e) {
+			log.trace("无法把请求参数转换为 " + entityClassName + " 对象: " + e.getLocalizedMessage(), e);
+			return null;
+		}
+
+		// 4.设置一些通用属性，比如：提交时间、提交用户
+		// 如果要调用业务数据的处理方法，必须要当前类实现ApplicationContextAware接口，把ApplicationContext传入
+		// 根据serviceClass到容器里面获取对应的Bean
+		BusinessDataService<BusinessData> service;
+		try {
+			service = this.applicationContext.getBean(serviceClass);
+		} catch (Exception e) {
+			log.trace("无法找到类型为 " + serviceClassName + " 的Bean: " + e.getLocalizedMessage(), e);
+			return null;
+		}
+
+		// 修改数据的时候，不能把时间、用户改变！
+		if (StringUtils.isEmpty(entity.getId())) {
+			entity.setSubmitTime(new Date());
+			entity.setUser(UserHolder.get());
+		} else {
+			BusinessData old = service.get(entity.getId());// 查询旧的数据
+			if (old == null) {
+				entity.setSubmitTime(new Date());
+				entity.setUser(UserHolder.get());
+			} else {
+				entity.setSubmitTime(old.getSubmitTime());
+				entity.setUser(old.getUser());
+			}
+		}
+		// 5.执行保存
+		// 返回的key其实就是数据的id，要用于跟流程实例关联起来的
+		String key = service.save(entity);
+		return key;
+	}
+
+	private WebDataBinder getWebDataBinder(Object target) {
+		WebDataBinder binder = new WebDataBinder(target);
+		// 注册自定义的转换器
+		binder.registerCustomEditor(Date.class, new DateTimePropertyEditor());
+		// ....
+
+		return binder;
 	}
 
 	private void saveProcessTrace(ProcessDefinition definition, ProcessInstance instance, Task task, String remark) {
@@ -322,6 +427,11 @@ public class WorkflowServiceImpl implements WorkflowService {
 		ProcessInstance instance = this.runtimeService.createProcessInstanceQuery()//
 				.processInstanceId(task.getProcessInstanceId())//
 				.singleResult();
+
+		// 业务数据的主键值，用于修改数据
+		variables.put("id", instance.getBusinessKey());
+		this.saveBusinessData(definition, variables);
+
 		// 8.完成任务，核心代码
 		this.taskService.complete(taskId, variables);
 		// 9.保存流程跟踪信息

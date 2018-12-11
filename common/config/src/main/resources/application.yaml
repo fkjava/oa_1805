@@ -35,3 +35,4 @@ spring:
       basename: org.fkjava.security.messages
 
 fkjava.storage.dir: /home/working/var/tmp
+#spring.main.allow-bean-definition-overriding: true
