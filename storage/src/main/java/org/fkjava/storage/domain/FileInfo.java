@@ -29,7 +29,7 @@ public class FileInfo implements Serializable {
 	@GenericGenerator(name = "uuid2", strategy = "uuid2")
 	@Column(length = 36)
 	private String id;
-	@Column(length = 20)
+	@Column(length = 1024)
 	private String name;
 
 	private Long fileSize;
