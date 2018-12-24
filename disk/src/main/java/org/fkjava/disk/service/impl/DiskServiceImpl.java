@@ -118,6 +118,9 @@ public class DiskServiceImpl implements DiskService {
 	@Override
 	public FileItem upload(FileItem item) {
 		item.setUser(UserHolder.get());
+		if(item.getParent() != null && StringUtils.isEmpty(item.getParent().getId())) {
+			item.setParent(null);
+		}
 		return this.fileItemRepository.save(item);
 	}
 
