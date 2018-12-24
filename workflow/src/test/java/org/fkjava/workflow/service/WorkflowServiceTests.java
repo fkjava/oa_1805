@@ -9,8 +9,6 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -20,8 +18,8 @@ import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.engine.task.Task;
 import org.fkjava.common.data.domain.Result;
 import org.fkjava.identity.UserHolder;
-import org.fkjava.identity.domain.Role;
 import org.fkjava.identity.domain.User;
+import org.fkjava.identity.service.IdentityService;
 import org.fkjava.workflow.WorkflowConfig;
 import org.fkjava.workflow.vo.ProcessForm;
 import org.fkjava.workflow.vo.TaskForm;
@@ -44,6 +42,8 @@ public class WorkflowServiceTests
 		extends AbstractTransactionalJUnit4SpringContextTests {
 	@Autowired
 	private WorkflowService workflowService;
+	@Autowired
+	private IdentityService identityService;
 	private String processDefinitionId;
 
 	// 把准备数据的代码，放入Before里面，这样保证每个@Test都有一份新的数据
@@ -73,17 +73,7 @@ public class WorkflowServiceTests
 
 		// 模拟用户、用户的角色（用户组）
 		// 需要把identity模块加入进来
-		User user = new User();
-		user.setId("用户1");
-		user.setName("用户1");
-
-		Role role = new Role();
-		role.setId("用户组1");
-		role.setName("用户组1");
-
-		List<Role> roles = new LinkedList<>();
-		roles.add(role);
-		user.setRoles(roles);
+		User user = this.identityService.findByLoginName("guanyu").orElse(null);
 
 		UserHolder.set(user);
 
